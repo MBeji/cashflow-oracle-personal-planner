@@ -44,7 +44,7 @@ export function VacationManager({ vacationExpenses, onVacationChange }: Vacation
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="july">Juillet {currentYear} (DA)</Label>
+            <Label htmlFor="july">Juillet {currentYear} (TND)</Label>
             <Input
               id="july"
               type="number"
@@ -55,7 +55,7 @@ export function VacationManager({ vacationExpenses, onVacationChange }: Vacation
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="august">Août {currentYear} (DA)</Label>
+            <Label htmlFor="august">Août {currentYear} (TND)</Label>
             <Input
               id="august"
               type="number"

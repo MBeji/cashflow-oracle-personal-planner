@@ -36,6 +36,14 @@ const Index = () => {
     );
   }, [settings.currentBalance, customExpenses, chantierExpenses, vacationExpenses]);
 
+  const handleCurrentBalanceChange = (value: number) => {
+    setSettings(prev => ({ ...prev, currentBalance: value }));
+  };
+
+  const handleAlertThresholdChange = (value: number) => {
+    setSettings(prev => ({ ...prev, alertThreshold: value }));
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -48,8 +56,48 @@ const Index = () => {
           </p>
         </div>
 
+        {/* Solde actuel - Maintenant dans la page principale */}
+        <div className="mb-6 max-w-md mx-auto">
+          <div className="space-y-2">
+            <label htmlFor="currentBalance" className="text-sm font-medium">
+              Solde actuel (TND)
+            </label>
+            <input
+              id="currentBalance"
+              type="number"
+              value={settings.currentBalance}
+              onChange={(e) => handleCurrentBalanceChange(Number(e.target.value))}
+              className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+        </div>
+
+        {/* Gestion des dépenses - Maintenant dans la page principale */}
+        <div className="mb-8 space-y-6">
+          <h2 className="text-2xl font-bold text-center">Gestion des dépenses</h2>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-6">
+              <VacationManager 
+                vacationExpenses={vacationExpenses}
+                onVacationChange={setVacationExpenses}
+              />
+              <ChantierManager 
+                chantierExpenses={chantierExpenses}
+                onChantierChange={setChantierExpenses}
+              />
+            </div>
+            <div>
+              <CustomExpensesManager 
+                expenses={customExpenses}
+                onExpensesChange={setCustomExpenses}
+              />
+            </div>
+          </div>
+        </div>
+
         <Tabs defaultValue="forecast" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="forecast" className="flex items-center gap-2">
               <Calculator className="h-4 w-4" />
               Prévisions
@@ -57,10 +105,6 @@ const Index = () => {
             <TabsTrigger value="statistics" className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               Statistiques
-            </TabsTrigger>
-            <TabsTrigger value="expenses" className="flex items-center gap-2">
-              <PiggyBank className="h-4 w-4" />
-              Dépenses
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <SettingsIcon className="h-4 w-4" />
@@ -76,33 +120,20 @@ const Index = () => {
             <Statistics data={monthlyData} alertThreshold={settings.alertThreshold} />
           </TabsContent>
 
-          <TabsContent value="expenses" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="space-y-6">
-                <VacationManager 
-                  vacationExpenses={vacationExpenses}
-                  onVacationChange={setVacationExpenses}
-                />
-                <ChantierManager 
-                  chantierExpenses={chantierExpenses}
-                  onChantierChange={setChantierExpenses}
-                />
-              </div>
-              <div>
-                <CustomExpensesManager 
-                  expenses={customExpenses}
-                  onExpensesChange={setCustomExpenses}
-                />
-              </div>
-            </div>
-          </TabsContent>
-
           <TabsContent value="settings" className="space-y-6">
             <div className="max-w-md mx-auto">
-              <CashFlowSettings 
-                settings={settings}
-                onSettingsChange={setSettings}
-              />
+              <div className="space-y-2">
+                <label htmlFor="alertThreshold" className="text-sm font-medium">
+                  Seuil d'alerte (TND)
+                </label>
+                <input
+                  id="alertThreshold"
+                  type="number"
+                  value={settings.alertThreshold}
+                  onChange={(e) => handleAlertThresholdChange(Number(e.target.value))}
+                  className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                />
+              </div>
             </div>
           </TabsContent>
         </Tabs>

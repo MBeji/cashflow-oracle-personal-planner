@@ -71,7 +71,7 @@ export function CustomExpensesManager({ expenses, onExpensesChange }: CustomExpe
             </div>
             
             <div>
-              <Label htmlFor="expenseAmount">Montant (DA)</Label>
+              <Label htmlFor="expenseAmount">Montant (TND)</Label>
               <Input
                 id="expenseAmount"
                 type="number"

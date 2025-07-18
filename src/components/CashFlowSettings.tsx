@@ -24,20 +24,7 @@ export function CashFlowSettings({ settings, onSettingsChange }: CashFlowSetting
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="currentBalance">Solde actuel (DA)</Label>
-          <Input
-            id="currentBalance"
-            type="number"
-            value={localSettings.currentBalance}
-            onChange={(e) => setLocalSettings({ 
-              ...localSettings, 
-              currentBalance: Number(e.target.value) 
-            })}
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="alertThreshold">Seuil d'alerte (DA)</Label>
+          <Label htmlFor="alertThreshold">Seuil d'alerte (TND)</Label>
           <Input
             id="alertThreshold"
             type="number"

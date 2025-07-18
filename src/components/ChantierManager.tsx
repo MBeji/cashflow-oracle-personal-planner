@@ -86,7 +86,7 @@ export function ChantierManager({ chantierExpenses, onChantierChange }: Chantier
             </div>
 
             <div>
-              <Label htmlFor="chantierAmount">Montant (DA)</Label>
+              <Label htmlFor="chantierAmount">Montant (TND)</Label>
               <Input
                 id="chantierAmount"
                 type="number"

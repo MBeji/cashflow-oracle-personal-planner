@@ -94,7 +94,7 @@ export function calculateMonthlyData(
 }
 
 export function formatCurrency(amount: number): string {
-  return `${amount.toLocaleString()} DA`;
+  return `${amount.toLocaleString()} TND`;
 }
 
 export function getMonthName(month: number): string {
