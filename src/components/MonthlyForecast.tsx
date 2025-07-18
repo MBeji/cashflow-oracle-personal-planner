@@ -169,10 +169,13 @@ export function MonthlyForecast({
           // Ajouter les revenus personnalisés
           const customRevenuesTotal = month.revenues.custom.reduce((sum, rev) => sum + rev.amount, 0);
           totalRevenues += customRevenuesTotal;
-            // Récupérer les valeurs des dépenses éditables
+
+          // Récupérer les valeurs des dépenses éditables
           const vacationAmount = vacationExpenses[monthKey] || 0;
           const chantierAmount = chantierExpenses[monthKey] || 0;
-          const customAmount = customExpenses[monthKey] || 0;          // Calculer les dépenses en excluant les éléments cachés
+          const customAmount = customExpenses[monthKey] || 0;
+
+          // Calculer les dépenses en excluant les éléments cachés
           // Pour le mois en cours, exclure automatiquement les dépenses fixes
           const monthlyCustomExpensesTotal = (monthlyCustomExpenses[monthKey] || []).reduce((sum, exp) => sum + exp.amount, 0);
           let totalExpenses = vacationAmount + month.expenses.school + 
@@ -182,8 +185,15 @@ export function MonthlyForecast({
           if (!hiddenExpenses.includes('currentExpenses') && !isCurrentMonthData) totalExpenses += month.expenses.currentExpenses;
           if (!hiddenExpenses.includes('fuel') && !isCurrentMonthData) totalExpenses += month.expenses.fuel;
           if (!hiddenExpenses.includes('healthInsurance') && !isCurrentMonthData) totalExpenses += month.expenses.healthInsurance;
-            const endingBalance = month.startingBalance + totalRevenues - totalExpenses;
-          const isAlert = isLowBalance(endingBalance, alertThreshold);
+
+          // Utiliser l'endingBalance de monthData qui est correctement calculé dans le flux principal
+          // Seulement pour l'affichage des éléments cachés, on recalcule localement
+          const hasHiddenItems = hiddenRevenues.length > 0 || hiddenExpenses.length > 0;
+          const displayBalance = hasHiddenItems ? 
+            (month.startingBalance + totalRevenues - totalExpenses) : 
+            month.endingBalance;
+          
+          const isAlert = isLowBalance(displayBalance, alertThreshold);
             // Vérifier si les vacances sont éditables (juillet/août seulement) et si elles sont configurées
           const canEditVacation = month.month === 7 || month.month === 8;
           const hasVacationExpense = vacationAmount > 0 || canEditVacation;
@@ -195,12 +205,11 @@ export function MonthlyForecast({
             <Card key={index} className={cn(isAlert && "border-destructive")}>
               <CardHeader>
                 <CardTitle className="flex justify-between items-center">
-                  <span>{getMonthName(month.month)} {month.year}</span>
-                  <span className={cn(
+                  <span>{getMonthName(month.month)} {month.year}</span>                  <span className={cn(
                     "text-lg font-bold",
                     isAlert ? "text-destructive" : "text-success"
                   )}>
-                    {formatCurrency(endingBalance)}
+                    {formatCurrency(displayBalance)}
                   </span>
                 </CardTitle>
               </CardHeader>              <CardContent>
