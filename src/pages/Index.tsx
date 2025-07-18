@@ -1,14 +1,10 @@
 import { useState, useMemo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CashFlowSettings } from '@/components/CashFlowSettings';
 import { MonthlyForecast } from '@/components/MonthlyForecast';
-import { CustomExpensesManager } from '@/components/CustomExpensesManager';
-import { VacationManager } from '@/components/VacationManager';
-import { ChantierManager } from '@/components/ChantierManager';
 import { Statistics } from '@/components/Statistics';
 import { calculateMonthlyData } from '@/utils/cashflow';
 import { CashFlowSettings as Settings, CustomExpense } from '@/types/cashflow';
-import { Calculator, TrendingUp, Settings as SettingsIcon, PiggyBank } from 'lucide-react';
+import { Calculator, TrendingUp, Settings as SettingsIcon } from 'lucide-react';
 
 const Index = () => {
   const [settings, setSettings] = useState<Settings>({
@@ -19,11 +15,18 @@ const Index = () => {
   const [customExpenses, setCustomExpenses] = useState<CustomExpense[]>([]);
   const [vacationExpenses, setVacationExpenses] = useState<{ [key: string]: number }>({});
   const [chantierExpenses, setChantierExpenses] = useState<{ [key: string]: number }>({});
+  const [customMonthlyExpenses, setCustomMonthlyExpenses] = useState<{ [key: string]: number }>({});
 
   const monthlyData = useMemo(() => {
     const currentDate = new Date();
     const startMonth = currentDate.getMonth() + 1;
     const startYear = currentDate.getFullYear();
+    
+    // Fusionner les dépenses vacances avec les dépenses éditables
+    const mergedVacationExpenses = { ...vacationExpenses };
+    
+    // Fusionner les dépenses chantier avec les dépenses éditables
+    const mergedChantierExpenses = { ...chantierExpenses };
     
     return calculateMonthlyData(
       startMonth,
@@ -31,10 +34,10 @@ const Index = () => {
       20,
       settings.currentBalance,
       customExpenses,
-      chantierExpenses,
-      vacationExpenses
+      mergedChantierExpenses,
+      mergedVacationExpenses
     );
-  }, [settings.currentBalance, customExpenses, chantierExpenses, vacationExpenses]);
+  }, [settings.currentBalance, customExpenses, chantierExpenses, vacationExpenses, customMonthlyExpenses]);
 
   const handleCurrentBalanceChange = (value: number) => {
     setSettings(prev => ({ ...prev, currentBalance: value }));
@@ -42,6 +45,27 @@ const Index = () => {
 
   const handleAlertThresholdChange = (value: number) => {
     setSettings(prev => ({ ...prev, alertThreshold: value }));
+  };
+
+  const handleVacationChange = (monthKey: string, amount: number) => {
+    setVacationExpenses(prev => ({
+      ...prev,
+      [monthKey]: amount
+    }));
+  };
+
+  const handleChantierChange = (monthKey: string, amount: number) => {
+    setChantierExpenses(prev => ({
+      ...prev,
+      [monthKey]: amount
+    }));
+  };
+
+  const handleCustomExpenseChange = (monthKey: string, amount: number) => {
+    setCustomMonthlyExpenses(prev => ({
+      ...prev,
+      [monthKey]: amount
+    }));
   };
 
   return (
@@ -72,30 +96,6 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Gestion des dépenses - Maintenant dans la page principale */}
-        <div className="mb-8 space-y-6">
-          <h2 className="text-2xl font-bold text-center">Gestion des dépenses</h2>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="space-y-6">
-              <VacationManager 
-                vacationExpenses={vacationExpenses}
-                onVacationChange={setVacationExpenses}
-              />
-              <ChantierManager 
-                chantierExpenses={chantierExpenses}
-                onChantierChange={setChantierExpenses}
-              />
-            </div>
-            <div>
-              <CustomExpensesManager 
-                expenses={customExpenses}
-                onExpensesChange={setCustomExpenses}
-              />
-            </div>
-          </div>
-        </div>
-
         <Tabs defaultValue="forecast" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="forecast" className="flex items-center gap-2">
@@ -113,7 +113,16 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="forecast" className="space-y-6">
-            <MonthlyForecast data={monthlyData} alertThreshold={settings.alertThreshold} />
+            <MonthlyForecast 
+              data={monthlyData} 
+              alertThreshold={settings.alertThreshold}
+              onVacationChange={handleVacationChange}
+              onChantierChange={handleChantierChange}
+              onCustomExpenseChange={handleCustomExpenseChange}
+              vacationExpenses={vacationExpenses}
+              chantierExpenses={chantierExpenses}
+              customExpenses={customMonthlyExpenses}
+            />
           </TabsContent>
 
           <TabsContent value="statistics" className="space-y-6">
