@@ -163,17 +163,16 @@ describe('Cashflow Utilities', () => {
       const marchMonth = result[0];
       const aprilMonth = result[1];
       
-      // Mars : solde initial 10000 - dépenses fixes (12500) - dépenses personnalisées (1000) = 10000 - 13500 = -3500
-      const marchExpectedExpenses = 6000 + 5000 + 500 + 1000 + 1000; // Dette + courantes + carburant + assurance + custom expenses
-      expect(marchMonth.endingBalance).toBe(10000 - marchExpectedExpenses); // 10000 - 13500 = -3500
+      // Mars (mois en cours) : solde initial 10000 - seulement dépenses personnalisées (1000) = 10000 - 1000 = 9000
+      // Pas de dépenses fixes pour le mois en cours
+      const marchExpectedExpenses = 1000; // Seulement les custom expenses, pas de dépenses fixes
+      expect(marchMonth.endingBalance).toBe(10000 - marchExpectedExpenses); // 10000 - 1000 = 9000
       
-      // Avril : solde précédent (-3500) + revenus de mars (14250 avec bonus) - dépenses fixes (27500) - école (15000) - custom (1200)
+      // Avril : solde précédent (9000) + revenus de mars (14250 avec bonus) - dépenses fixes (12500) - école (15000) - custom (1200)
       const aprilRevenues = 12750 + 500 + 1000 + 19125; // Salaire + carburant + assurance + bonus de mars
       const aprilExpenses = 6000 + 5000 + 500 + 1000 + 15000 + 1200; // Dette + courantes + carburant + assurance + école + custom
       expect(aprilMonth.endingBalance).toBe(marchMonth.endingBalance + aprilRevenues - aprilExpenses);
-    });
-
-    it('should calculate ending balance correctly', () => {
+    });    it('should calculate ending balance correctly', () => {
       const result = calculateMonthlyData(
         1, 2025, 2, 10000, [], {}, {}, [], defaultFixedAmounts, {}
       );
@@ -181,11 +180,11 @@ describe('Cashflow Utilities', () => {
       const firstMonth = result[0];
       const secondMonth = result[1];
 
-      // Premier mois: balance initiale - dépenses (pas de revenus)
-      const firstMonthExpenses = 6000 + 5000 + 500 + 1000; // Dette + dépenses courantes + carburant + assurance
-      expect(firstMonth.endingBalance).toBe(10000 - firstMonthExpenses);
+      // Premier mois (mois en cours): balance initiale - pas de dépenses fixes = 10000
+      // Les dépenses fixes sont exclues pour le mois en cours
+      expect(firstMonth.endingBalance).toBe(10000); // Pas de dépenses pour le mois en cours
 
-      // Deuxième mois: solde précédent + revenus - dépenses
+      // Deuxième mois: solde précédent + revenus - dépenses fixes
       const secondMonthRevenues = 12750 + 500 + 1000; // Salaire + carburant + assurance
       const secondMonthExpenses = 6000 + 5000 + 500 + 1000; // Dette + dépenses courantes + carburant + assurance
       expect(secondMonth.endingBalance).toBe(firstMonth.endingBalance + secondMonthRevenues - secondMonthExpenses);

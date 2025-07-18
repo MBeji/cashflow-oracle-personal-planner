@@ -21,8 +21,25 @@ import { CashFlowSettings as Settings, CustomExpense, FixedAmounts, MonthlyCusto
 import { Calculator, TrendingUp, Settings as SettingsIcon, LayoutGrid, List } from 'lucide-react';
 
 const defaultExpenseSettings: ExpenseSettings = {
-  defaultCategories: [],
-  defaultSubcategories: [],
+  defaultCategories: [
+    { id: '1', name: 'Alimentation & Maison', amount: 2000, color: '#ef4444' },
+    { id: '2', name: 'Femme de ménage', amount: 200, color: '#f97316' },
+    { id: '3', name: 'Enfants (Études & Club)', amount: 700, color: '#eab308' },
+    { id: '4', name: 'Factures', amount: 300, color: '#22c55e' },
+    { id: '5', name: 'Achats divers', amount: 500, color: '#3b82f6' },
+    { id: '6', name: 'Restaurants & Sorties', amount: 400, color: '#a855f7' }
+  ],
+  defaultSubcategories: [
+    { id: '1-1', name: 'Alimentation', amount: 1500, parentCategoryId: '1' },
+    { id: '1-2', name: 'Produits ménagers', amount: 300, parentCategoryId: '1' },
+    { id: '1-3', name: 'Besoins maison récurrents', amount: 200, parentCategoryId: '1' },
+    { id: '3-1', name: 'Frais scolaires', amount: 400, parentCategoryId: '3' },
+    { id: '3-2', name: 'Club sportif/activités', amount: 300, parentCategoryId: '3' },
+    { id: '4-1', name: 'Eau & Électricité', amount: 200, parentCategoryId: '4' },
+    { id: '4-2', name: 'Internet', amount: 100, parentCategoryId: '4' },
+    { id: '6-1', name: 'Restaurants', amount: 250, parentCategoryId: '6' },
+    { id: '6-2', name: 'Sorties & Loisirs familiaux', amount: 150, parentCategoryId: '6' }
+  ],
   monthlyBreakdowns: []
 };
 

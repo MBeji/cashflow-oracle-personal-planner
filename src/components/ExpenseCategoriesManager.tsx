@@ -27,24 +27,24 @@ interface ExpenseCategoriesManagerProps {
 }
 
 const DEFAULT_CATEGORIES: ExpenseCategory[] = [
-  { id: '1', name: 'Alimentation', amount: 1500, color: '#10B981' },
-  { id: '2', name: 'Transport', amount: 800, color: '#3B82F6' },
-  { id: '3', name: 'Logement', amount: 1200, color: '#F59E0B' },
-  { id: '4', name: 'Santé', amount: 300, color: '#EF4444' },
-  { id: '5', name: 'Loisirs', amount: 600, color: '#8B5CF6' },
-  { id: '6', name: 'Autres', amount: 600, color: '#6B7280' }
+  { id: '1', name: 'Alimentation & Maison', amount: 2000, color: '#ef4444' },
+  { id: '2', name: 'Femme de ménage', amount: 200, color: '#f97316' },
+  { id: '3', name: 'Enfants (Études & Club)', amount: 700, color: '#eab308' },
+  { id: '4', name: 'Factures', amount: 300, color: '#22c55e' },
+  { id: '5', name: 'Achats divers', amount: 500, color: '#3b82f6' },
+  { id: '6', name: 'Restaurants & Sorties', amount: 400, color: '#a855f7' }
 ];
 
 const DEFAULT_SUBCATEGORIES: ExpenseSubCategory[] = [
-  { id: '1-1', name: 'Courses', amount: 1000, parentCategoryId: '1' },
-  { id: '1-2', name: 'Restaurants', amount: 500, parentCategoryId: '1' },
-  { id: '2-1', name: 'Essence', amount: 400, parentCategoryId: '2' },
-  { id: '2-2', name: 'Maintenance', amount: 200, parentCategoryId: '2' },
-  { id: '2-3', name: 'Taxi/Uber', amount: 200, parentCategoryId: '2' },
-  { id: '3-1', name: 'Électricité', amount: 300, parentCategoryId: '3' },
-  { id: '3-2', name: 'Eau', amount: 150, parentCategoryId: '3' },
-  { id: '3-3', name: 'Internet', amount: 100, parentCategoryId: '3' },
-  { id: '3-4', name: 'Entretien', amount: 650, parentCategoryId: '3' }
+  { id: '1-1', name: 'Alimentation', amount: 1500, parentCategoryId: '1' },
+  { id: '1-2', name: 'Produits ménagers', amount: 300, parentCategoryId: '1' },
+  { id: '1-3', name: 'Besoins maison récurrents', amount: 200, parentCategoryId: '1' },
+  { id: '3-1', name: 'Frais scolaires', amount: 400, parentCategoryId: '3' },
+  { id: '3-2', name: 'Club sportif/activités', amount: 300, parentCategoryId: '3' },
+  { id: '4-1', name: 'Eau & Électricité', amount: 200, parentCategoryId: '4' },
+  { id: '4-2', name: 'Internet', amount: 100, parentCategoryId: '4' },
+  { id: '6-1', name: 'Restaurants', amount: 250, parentCategoryId: '6' },
+  { id: '6-2', name: 'Sorties & Loisirs familiaux', amount: 150, parentCategoryId: '6' }
 ];
 
 export function ExpenseCategoriesManager({ 
