@@ -24,21 +24,20 @@ const defaultExpenseSettings: ExpenseSettings = {
   defaultCategories: [
     { id: '1', name: 'Alimentation & Maison', amount: 2000, color: '#ef4444' },
     { id: '2', name: 'Femme de ménage', amount: 200, color: '#f97316' },
-    { id: '3', name: 'Enfants (Études & Club)', amount: 700, color: '#eab308' },
-    { id: '4', name: 'Factures', amount: 300, color: '#22c55e' },
-    { id: '5', name: 'Achats divers', amount: 500, color: '#3b82f6' },
-    { id: '6', name: 'Restaurants & Sorties', amount: 400, color: '#a855f7' }
+    { id: '3', name: 'Enfants (Études & Club)', amount: 500, color: '#eab308' },
+    { id: '4', name: 'Factures', amount: 200, color: '#22c55e' },
+    { id: '5', name: 'Restaurants & Sorties', amount: 400, color: '#a855f7' }
   ],
   defaultSubcategories: [
     { id: '1-1', name: 'Alimentation', amount: 1500, parentCategoryId: '1' },
     { id: '1-2', name: 'Produits ménagers', amount: 300, parentCategoryId: '1' },
     { id: '1-3', name: 'Besoins maison récurrents', amount: 200, parentCategoryId: '1' },
-    { id: '3-1', name: 'Frais scolaires', amount: 400, parentCategoryId: '3' },
-    { id: '3-2', name: 'Club sportif/activités', amount: 300, parentCategoryId: '3' },
-    { id: '4-1', name: 'Eau & Électricité', amount: 200, parentCategoryId: '4' },
+    { id: '3-1', name: 'Frais scolaires', amount: 250, parentCategoryId: '3' },
+    { id: '3-2', name: 'Club sportif/activités', amount: 250, parentCategoryId: '3' },
+    { id: '4-1', name: 'Eau & Électricité', amount: 100, parentCategoryId: '4' },
     { id: '4-2', name: 'Internet', amount: 100, parentCategoryId: '4' },
-    { id: '6-1', name: 'Restaurants', amount: 250, parentCategoryId: '6' },
-    { id: '6-2', name: 'Sorties & Loisirs familiaux', amount: 150, parentCategoryId: '6' }
+    { id: '5-1', name: 'Restaurants', amount: 250, parentCategoryId: '5' },
+    { id: '5-2', name: 'Sorties & Loisirs familiaux', amount: 150, parentCategoryId: '5' }
   ],
   monthlyBreakdowns: []
 };
@@ -63,7 +62,7 @@ const defaultFixedAmounts: FixedAmounts = {
     december: 6375    // 0.5 * 12750
   },
   debt: 6000,
-  currentExpenses: 5000,
+  currentExpenses: 3300, // 2000 + 200 + 500 + 200 + 400 = 3300 TND
   fuelExpense: 500,
   healthInsuranceExpense: 1000,
   schoolExpense: 15000
@@ -80,12 +79,10 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
   });  const [customExpenses, setCustomExpenses] = useState<CustomExpense[]>([]);
   const [vacationExpenses, setVacationExpenses] = useState<{ [key: string]: number }>(getDefaultVacationExpenses());
   const [chantierExpenses, setChantierExpenses] = useState<{ [key: string]: number }>({});
-  const [customMonthlyExpenses, setCustomMonthlyExpenses] = useState<{ [key: string]: number }>({});
   const [monthlyCustomExpenses, setMonthlyCustomExpenses] = useState<{ [key: string]: MonthlyCustomExpense[] }>({});
   const [viewMode, setViewMode] = useState<'detailed' | 'compact'>('detailed');
   const [selectedMonthIndex, setSelectedMonthIndex] = useState<number | null>(null);  // Charger les données au démarrage
-  useEffect(() => {
-    const savedSettings = StorageService.load('cashflow-settings', settings);
+  useEffect(() => {    const savedSettings = StorageService.load('cashflow-settings', settings);
     // S'assurer que fixedAmounts existe dans les données chargées
     if (!savedSettings.fixedAmounts) {
       savedSettings.fixedAmounts = defaultFixedAmounts;
@@ -93,14 +90,12 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
     const savedCustomExpenses = StorageService.load('cashflow-custom-expenses', []);
     const savedVacationExpenses = StorageService.load('cashflow-vacation-expenses', getDefaultVacationExpenses());
     const savedChantierExpenses = StorageService.load('cashflow-chantier-expenses', {});
-    const savedMonthlyExpenses = StorageService.load('cashflow-monthly-expenses', {});
     const savedMonthlyCustomExpenses = StorageService.load('cashflow-monthly-custom-expenses', {});
 
     setSettings(savedSettings);
     setCustomExpenses(savedCustomExpenses);
     setVacationExpenses(savedVacationExpenses);
     setChantierExpenses(savedChantierExpenses);
-    setCustomMonthlyExpenses(savedMonthlyExpenses);
     setMonthlyCustomExpenses(savedMonthlyCustomExpenses);
   }, []);
 
@@ -116,13 +111,9 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
   useEffect(() => {
     StorageService.save('cashflow-vacation-expenses', vacationExpenses);
   }, [vacationExpenses]);
-
   useEffect(() => {
     StorageService.save('cashflow-chantier-expenses', chantierExpenses);
   }, [chantierExpenses]);
-  useEffect(() => {
-    StorageService.save('cashflow-monthly-expenses', customMonthlyExpenses);
-  }, [customMonthlyExpenses]);
 
   useEffect(() => {
     StorageService.save('cashflow-monthly-custom-expenses', monthlyCustomExpenses);
@@ -150,7 +141,7 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
       monthlyCustomExpenses,
       settings.expenseSettings
     );
-  }, [settings, customExpenses, chantierExpenses, vacationExpenses, customMonthlyExpenses, monthlyCustomExpenses]);
+  }, [settings, customExpenses, chantierExpenses, vacationExpenses, monthlyCustomExpenses]);
 
   const handleCurrentBalanceChange = (value: number) => {
     setSettings(prev => ({ ...prev, currentBalance: value }));
@@ -166,14 +157,8 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
       [monthKey]: amount
     }));
   };
-
   const handleChantierChange = (monthKey: string, amount: number) => {
     setChantierExpenses(prev => ({
-      ...prev,
-      [monthKey]: amount
-    }));
-  };  const handleCustomExpenseChange = (monthKey: string, amount: number) => {
-    setCustomMonthlyExpenses(prev => ({
       ...prev,
       [monthKey]: amount
     }));
@@ -200,16 +185,14 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
       ...prev,
       expenseSettings: newExpenseSettings
     }));
-  };
-  const handleDataImport = (data: any) => {
+  };  const handleDataImport = (data: any) => {
     if (data.settings) setSettings(data.settings);
     if (data.customExpenses) setCustomExpenses(data.customExpenses);
     if (data.vacationExpenses) setVacationExpenses(data.vacationExpenses);
     if (data.chantierExpenses) setChantierExpenses(data.chantierExpenses);
-    if (data.customMonthlyExpenses) setCustomMonthlyExpenses(data.customMonthlyExpenses);
     if (data.monthlyCustomExpenses) setMonthlyCustomExpenses(data.monthlyCustomExpenses);
     alert('Données importées avec succès !');
-  };  const handleReset = () => {
+  };const handleReset = () => {
     if (confirm('Êtes-vous sûr de vouloir réinitialiser toutes les données ?')) {      const defaultSettings: Settings = {
         currentBalance: 3500,
         alertThreshold: 2000,
@@ -222,7 +205,6 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
       setCustomExpenses([]);
       setVacationExpenses(getDefaultVacationExpenses());
       setChantierExpenses({});
-      setCustomMonthlyExpenses({});
       setMonthlyCustomExpenses({});
       
       // Supprimer du localStorage
@@ -230,7 +212,6 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
       StorageService.remove('cashflow-custom-expenses');
       StorageService.remove('cashflow-vacation-expenses');
       StorageService.remove('cashflow-chantier-expenses');
-      StorageService.remove('cashflow-monthly-expenses');
       StorageService.remove('cashflow-monthly-custom-expenses');
       
       alert('Données réinitialisées !');
@@ -304,8 +285,7 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
                   Détaillé
                 </Button>
               </div>
-            </div>            {viewMode === 'compact' ? (
-              <CompactView 
+            </div>            {viewMode === 'compact' ? (              <CompactView 
                 data={monthlyData}
                 alertThreshold={settings.alertThreshold}
                 onMonthClick={(index) => {
@@ -314,7 +294,6 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
                 }}
                 vacationExpenses={vacationExpenses}
                 chantierExpenses={chantierExpenses}
-                customExpenses={customMonthlyExpenses}
               />
             ) : (              <MonthlyForecast 
                 data={monthlyData} 
@@ -322,12 +301,10 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
                 monthsToDisplay={settings.monthsToDisplay}
                 onVacationChange={handleVacationChange}
                 onChantierChange={handleChantierChange}
-                onCustomExpenseChange={handleCustomExpenseChange}
                 onMonthlyCustomExpenseAdd={handleMonthlyCustomExpenseAdd}
                 onMonthlyCustomExpenseRemove={handleMonthlyCustomExpenseRemove}
                 vacationExpenses={vacationExpenses}
                 chantierExpenses={chantierExpenses}
-                customExpenses={customMonthlyExpenses}
                 monthlyCustomExpenses={monthlyCustomExpenses}
               />
             )}
@@ -381,13 +358,11 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
                 chantierExpenses={chantierExpenses}
                 onChantierChange={setChantierExpenses}
               />
-              
-              <DataManagement
+                <DataManagement
                 settings={settings}
                 customExpenses={customExpenses}
                 vacationExpenses={vacationExpenses}
                 chantierExpenses={chantierExpenses}
-                customMonthlyExpenses={customMonthlyExpenses}
                 onDataImport={handleDataImport}
                 onReset={handleReset}
               />

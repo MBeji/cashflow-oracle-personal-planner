@@ -9,7 +9,6 @@ interface CompactViewProps {
   onMonthClick: (index: number) => void;
   vacationExpenses: { [key: string]: number };
   chantierExpenses: { [key: string]: number };
-  customExpenses: { [key: string]: number };
 }
 
 export function CompactView({ 
@@ -17,8 +16,7 @@ export function CompactView({
   alertThreshold, 
   onMonthClick, 
   vacationExpenses, 
-  chantierExpenses, 
-  customExpenses 
+  chantierExpenses
 }: CompactViewProps) {
   const isCurrentMonth = (month: number, year: number) => {
     const now = new Date();
@@ -32,11 +30,9 @@ export function CompactView({
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">        {data.map((month, index) => {
           const monthKey = `${month.year}-${month.month.toString().padStart(2, '0')}`;
           const isCurrentMonthData = isCurrentMonth(month.month, month.year);
-          
-          // Récupérer les valeurs des dépenses éditables
+            // Récupérer les valeurs des dépenses éditables
           const vacationAmount = vacationExpenses[monthKey] || 0;
           const chantierAmount = chantierExpenses[monthKey] || 0;
-          const customAmount = customExpenses[monthKey] || 0;
           
           // Calculer les revenus en excluant les fixes pour le mois en cours
           let totalRevenues = 0;
@@ -49,7 +45,7 @@ export function CompactView({
           // Calculer les dépenses en excluant les fixes pour le mois en cours
           let totalExpenses = vacationAmount + month.expenses.school + 
                              month.expenses.custom.reduce((sum, exp) => sum + exp.amount, 0) +
-                             chantierAmount + customAmount;
+                             chantierAmount;
           if (!isCurrentMonthData) {
             totalExpenses += month.expenses.debt + month.expenses.currentExpenses + 
                             month.expenses.fuel + month.expenses.healthInsurance;

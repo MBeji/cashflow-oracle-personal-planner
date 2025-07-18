@@ -100,19 +100,20 @@ export function FixedAmountsManager({ fixedAmounts, onFixedAmountsChange }: Fixe
               <p className="text-xs text-muted-foreground mt-1">
                 Actuel: {formatCurrency(fixedAmounts.debt)}
               </p>
-            </div>
-
-            <div>
+            </div>            <div>
               <Label htmlFor="currentExpenses">Dépenses courantes</Label>
               <Input
                 id="currentExpenses"
                 type="number"
                 value={fixedAmounts.currentExpenses}
                 onChange={(e) => handleChange('currentExpenses', Number(e.target.value) || 0)}
-                placeholder="5000"
+                placeholder="3300"
               />
               <p className="text-xs text-muted-foreground mt-1">
                 Actuel: {formatCurrency(fixedAmounts.currentExpenses)}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                💡 Répartition suggérée: Alimentation & Maison (2000) + Femme de ménage (200) + Enfants (500) + Factures (200) + Restaurants & Sorties (400) = 3300 TND
               </p>
             </div>
 

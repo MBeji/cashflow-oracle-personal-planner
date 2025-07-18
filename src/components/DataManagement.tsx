@@ -12,7 +12,6 @@ interface DataManagementProps {
   customExpenses: CustomExpense[];
   vacationExpenses: { [key: string]: number };
   chantierExpenses: { [key: string]: number };
-  customMonthlyExpenses: { [key: string]: number };
   onDataImport: (data: any) => void;
   onReset: () => void;
 }
@@ -22,7 +21,6 @@ export function DataManagement({
   customExpenses,
   vacationExpenses,
   chantierExpenses,
-  customMonthlyExpenses,
   onDataImport,
   onReset
 }: DataManagementProps) {
@@ -43,13 +41,11 @@ export function DataManagement({
       alert('Erreur lors de l\'importation du fichier');
     }
   };
-
   const handleSave = () => {
     StorageService.save('cashflow-settings', settings);
     StorageService.save('cashflow-custom-expenses', customExpenses);
     StorageService.save('cashflow-vacation-expenses', vacationExpenses);
     StorageService.save('cashflow-chantier-expenses', chantierExpenses);
-    StorageService.save('cashflow-monthly-expenses', customMonthlyExpenses);
     alert('Données sauvegardées avec succès !');
   };
 

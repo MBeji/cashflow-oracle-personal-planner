@@ -25,14 +25,13 @@ export const StorageService = {
       console.error('Erreur lors de la suppression:', error);
     }
   },
-
   export: () => {
     const data = {
       settings: StorageService.load('cashflow-settings', null),
       customExpenses: StorageService.load('cashflow-custom-expenses', []),
       vacationExpenses: StorageService.load('cashflow-vacation-expenses', {}),
       chantierExpenses: StorageService.load('cashflow-chantier-expenses', {}),
-      customMonthlyExpenses: StorageService.load('cashflow-monthly-expenses', {}),
+      monthlyCustomExpenses: StorageService.load('cashflow-monthly-custom-expenses', {}),
       exportDate: new Date().toISOString()
     };
     

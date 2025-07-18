@@ -13,12 +13,10 @@ interface MonthlyForecastProps {
   monthsToDisplay: number;
   onVacationChange: (monthKey: string, amount: number) => void;
   onChantierChange: (monthKey: string, amount: number) => void;
-  onCustomExpenseChange: (monthKey: string, amount: number) => void;
   onMonthlyCustomExpenseAdd: (monthKey: string, expense: MonthlyCustomExpense) => void;
   onMonthlyCustomExpenseRemove: (monthKey: string, expenseId: string) => void;
   vacationExpenses: { [key: string]: number };
   chantierExpenses: { [key: string]: number };
-  customExpenses: { [key: string]: number };
   monthlyCustomExpenses: { [key: string]: MonthlyCustomExpense[] };
 }
 
@@ -28,12 +26,10 @@ export function MonthlyForecast({
   monthsToDisplay,
   onVacationChange, 
   onChantierChange, 
-  onCustomExpenseChange,
   onMonthlyCustomExpenseAdd,
   onMonthlyCustomExpenseRemove,
   vacationExpenses,
   chantierExpenses,
-  customExpenses,
   monthlyCustomExpenses
 }: MonthlyForecastProps) {
     // État pour gérer les éléments supprimés pour le mois en cours
@@ -50,14 +46,8 @@ export function MonthlyForecast({
     onVacationChange(monthKey, amount);
   };
 
-  const handleChantierChange = (monthKey: string, value: string) => {
-    const amount = Number(value) || 0;
+  const handleChantierChange = (monthKey: string, value: string) => {    const amount = Number(value) || 0;
     onChantierChange(monthKey, amount);
-  };
-
-  const handleCustomChange = (monthKey: string, value: string) => {
-    const amount = Number(value) || 0;
-    onCustomExpenseChange(monthKey, amount);
   };
 
   const hideRevenueItem = (monthKey: string, itemKey: string) => {
@@ -168,19 +158,16 @@ export function MonthlyForecast({
           
           // Ajouter les revenus personnalisés
           const customRevenuesTotal = month.revenues.custom.reduce((sum, rev) => sum + rev.amount, 0);
-          totalRevenues += customRevenuesTotal;
-
-          // Récupérer les valeurs des dépenses éditables
+          totalRevenues += customRevenuesTotal;          // Récupérer les valeurs des dépenses éditables
           const vacationAmount = vacationExpenses[monthKey] || 0;
           const chantierAmount = chantierExpenses[monthKey] || 0;
-          const customAmount = customExpenses[monthKey] || 0;
 
           // Calculer les dépenses en excluant les éléments cachés
           // Pour le mois en cours, exclure automatiquement les dépenses fixes
           const monthlyCustomExpensesTotal = (monthlyCustomExpenses[monthKey] || []).reduce((sum, exp) => sum + exp.amount, 0);
           let totalExpenses = vacationAmount + month.expenses.school + 
                              month.expenses.custom.reduce((sum, exp) => sum + exp.amount, 0) +
-                             chantierAmount + customAmount + monthlyCustomExpensesTotal;
+                             chantierAmount + monthlyCustomExpensesTotal;
           if (!hiddenExpenses.includes('debt') && !isCurrentMonthData) totalExpenses += month.expenses.debt;
           if (!hiddenExpenses.includes('currentExpenses') && !isCurrentMonthData) totalExpenses += month.expenses.currentExpenses;
           if (!hiddenExpenses.includes('fuel') && !isCurrentMonthData) totalExpenses += month.expenses.fuel;
@@ -496,8 +483,7 @@ export function MonthlyForecast({
                             ...prev,
                             [monthKey]: e.target.value
                           }))}
-                          className="text-sm"
-                        />
+                          className="text-sm"                        />
                         <div className="flex gap-2">
                           <Button
                             size="sm"
@@ -538,23 +524,6 @@ export function MonthlyForecast({
                     </div>
                   )}
 
-                  {/* Colonne Autres dépenses - toujours visible */}
-                  <div>
-                    <h4 className="font-semibold text-warning mb-2">Autres dépenses</h4>
-                    <Input
-                      type="number"
-                      value={customAmount}
-                      onChange={(e) => handleCustomChange(monthKey, e.target.value)}
-                      placeholder="0"
-                      className="w-full text-sm"
-                    />
-                    {customAmount > 0 && (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {formatCurrency(customAmount)}
-                      </p>
-                    )}
-                  </div>
-                  
                   {/* Colonne Total dépenses */}
                   <div>
                     <h4 className="font-semibold text-destructive mb-2">Total dépenses</h4>
