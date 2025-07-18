@@ -1,18 +1,4 @@
-import { MonthlyData, CustomExpense, BonusSchedule } from '@/types/cashflow';
-
-const BASE_SALARY = 12750;
-const FUEL_AMOUNT = 500;
-const HEALTH_INSURANCE = 1000;
-const DEBT_AMOUNT = 6000;
-const CURRENT_EXPENSES = 5000;
-const SCHOOL_AMOUNT = 15000;
-
-const BONUS_SCHEDULE: BonusSchedule = {
-  march: 1.5 * BASE_SALARY,
-  june: 0.5 * BASE_SALARY,
-  september: 1.5 * BASE_SALARY,
-  december: 0.5 * BASE_SALARY,
-};
+import { MonthlyData, CustomExpense, BonusSchedule, CustomRevenue, FixedAmounts, MonthlyCustomExpense, ExpenseSettings } from '@/types/cashflow';
 
 export function calculateMonthlyData(
   startMonth: number,
@@ -21,22 +7,50 @@ export function calculateMonthlyData(
   initialBalance: number,
   customExpenses: CustomExpense[] = [],
   chantierExpenses: { [key: string]: number } = {},
-  vacationExpenses: { [key: string]: number } = {}
+  vacationExpenses: { [key: string]: number } = {},
+  customRevenues: CustomRevenue[] = [],
+  fixedAmounts: FixedAmounts,
+  monthlyCustomExpenses: { [key: string]: MonthlyCustomExpense[] } = {},
+  expenseSettings?: ExpenseSettings
 ): MonthlyData[] {
   const result: MonthlyData[] = [];
-  let currentBalance = initialBalance;
-
-  for (let i = 0; i < months; i++) {
+  let currentBalance = initialBalance;  for (let i = 0; i < months; i++) {
     const currentMonth = ((startMonth - 1 + i) % 12) + 1;
     const currentYear = startYear + Math.floor((startMonth - 1 + i) / 12);
     const monthKey = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
 
-    // Calculate bonus for this month
+    // Déterminer si c'est le mois en cours (premier mois de la prévision)
+    const isCurrentMonth = i === 0;
+
+    // Calculate revenues for this month (from previous month's earnings)
+    // For the current month, we don't have revenues yet as they are paid at month end
+    let salary = 0;
+    let fuel = 0;
+    let healthInsurance = 0;
     let bonus = 0;
-    if (currentMonth === 3) bonus = BONUS_SCHEDULE.march;
-    if (currentMonth === 6) bonus = BONUS_SCHEDULE.june;
-    if (currentMonth === 9) bonus = BONUS_SCHEDULE.september;
-    if (currentMonth === 12) bonus = BONUS_SCHEDULE.december;
+
+    if (!isCurrentMonth && (i > 0 || startMonth > 1)) {
+      // Calculate previous month to get revenues from
+      const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+      const prevYear = currentMonth === 1 ? currentYear - 1 : currentYear;        // Regular monthly revenues from previous month
+      salary = fixedAmounts.salary;
+      fuel = fixedAmounts.fuelRevenue;
+      healthInsurance = fixedAmounts.healthInsuranceRevenue;
+      
+      // Bonus from previous month
+      if (prevMonth === 3) bonus = fixedAmounts.bonusMultipliers.march;
+      if (prevMonth === 6) bonus = fixedAmounts.bonusMultipliers.june;
+      if (prevMonth === 9) bonus = fixedAmounts.bonusMultipliers.september;
+      if (prevMonth === 12) bonus = fixedAmounts.bonusMultipliers.december;
+    }
+
+    // Calculate custom revenues for this month
+    const monthCustomRevenues = customRevenues.filter(revenue => {
+      if (revenue.isRecurring) return true;
+      return revenue.month === currentMonth && revenue.year === currentYear;
+    });
+
+    const totalCustomRevenues = monthCustomRevenues.reduce((sum, revenue) => sum + revenue.amount, 0);
 
     // Calculate custom expenses for this month
     const monthCustomExpenses = customExpenses.filter(expense => {
@@ -44,47 +58,57 @@ export function calculateMonthlyData(
       return expense.month === currentMonth && expense.year === currentYear;
     });
 
-    const totalCustomExpenses = monthCustomExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-
-    // School expenses (April only)
-    const schoolExpense = currentMonth === 4 ? SCHOOL_AMOUNT : 0;
+    const totalCustomExpenses = monthCustomExpenses.reduce((sum, expense) => sum + expense.amount, 0);    // School expenses (April only)
+    const schoolExpense = currentMonth === 4 ? fixedAmounts.schoolExpense : 0;
 
     // Vacation expenses (July and August)
-    const vacationExpense = vacationExpenses[monthKey] || 0;
+    const vacationExpense = vacationExpenses[monthKey] || 0;    // Chantier expenses
+    const chantierExpense = chantierExpenses[monthKey] || 0;    // Monthly custom expenses
+    const monthlyCustomExpensesTotal = (monthlyCustomExpenses[monthKey] || []).reduce((sum, exp) => sum + exp.amount, 0);
 
-    // Chantier expenses
-    const chantierExpense = chantierExpenses[monthKey] || 0;
-
-    const monthData: MonthlyData = {
+    // Calculate current expenses from categories if available
+    let currentExpensesAmount = fixedAmounts.currentExpenses;
+    if (expenseSettings?.monthlyBreakdowns) {
+      const breakdown = expenseSettings.monthlyBreakdowns.find(
+        b => b.month === (currentMonth - 1) && b.year === currentYear
+      );
+      if (breakdown) {
+        currentExpensesAmount = breakdown.totalAmount;
+      }
+    }const monthData: MonthlyData = {
       month: currentMonth,
       year: currentYear,
       startingBalance: currentBalance,
       revenues: {
-        salary: BASE_SALARY,
-        fuel: FUEL_AMOUNT,
-        healthInsurance: HEALTH_INSURANCE,
+        salary,
+        fuel,
+        healthInsurance,
         bonus,
-      },
-      expenses: {
-        debt: DEBT_AMOUNT,
-        currentExpenses: CURRENT_EXPENSES,
-        fuel: FUEL_AMOUNT, // Auto-consumed
-        healthInsurance: HEALTH_INSURANCE, // Auto-consumed
+        custom: monthCustomRevenues,
+      },      expenses: {
+        debt: isCurrentMonth ? 0 : fixedAmounts.debt, // Pas de dette pour le mois en cours
+        currentExpenses: isCurrentMonth ? 0 : currentExpensesAmount, // Pas de dépenses courantes pour le mois en cours
+        fuel: isCurrentMonth ? 0 : fixedAmounts.fuelExpense, // Auto-consumed, pas pour le mois en cours
+        healthInsurance: isCurrentMonth ? 0 : fixedAmounts.healthInsuranceExpense, // Auto-consumed, pas pour le mois en cours
         vacation: vacationExpense,
         school: schoolExpense,
-        custom: monthCustomExpenses,
+        custom: [...monthCustomExpenses, ...(monthlyCustomExpenses[monthKey] || []).map(exp => ({
+          id: exp.id,
+          name: exp.type,
+          amount: exp.amount,
+          isRecurring: false
+        }))],
         chantier: chantierExpense,
       },
       endingBalance: 0, // Will be calculated below
-    };
-
-    // Calculate ending balance
-    const totalRevenues = monthData.revenues.salary + monthData.revenues.fuel + monthData.revenues.healthInsurance + monthData.revenues.bonus;
+    };    // Calculate ending balance
+    const totalRevenues = monthData.revenues.salary + monthData.revenues.fuel + monthData.revenues.healthInsurance + monthData.revenues.bonus + totalCustomRevenues;
+    
+    // Pour le calcul des dépenses totales, on utilise les valeurs réelles du monthData (qui sont déjà à 0 pour le mois en cours)
     const totalExpenses = monthData.expenses.debt + monthData.expenses.currentExpenses + monthData.expenses.fuel + 
                          monthData.expenses.healthInsurance + monthData.expenses.vacation + monthData.expenses.school + 
-                         totalCustomExpenses + monthData.expenses.chantier;
-
-    monthData.endingBalance = currentBalance + totalRevenues - totalExpenses;
+                         monthData.expenses.custom.reduce((sum, exp) => sum + exp.amount, 0) + monthData.expenses.chantier;    monthData.endingBalance = currentBalance + totalRevenues - totalExpenses;
+    
     currentBalance = monthData.endingBalance;
 
     result.push(monthData);
@@ -94,7 +118,7 @@ export function calculateMonthlyData(
 }
 
 export function formatCurrency(amount: number): string {
-  return `${amount.toLocaleString()} TND`;
+  return `${amount.toLocaleString('en-US')} TND`;
 }
 
 export function getMonthName(month: number): string {

@@ -10,8 +10,9 @@ interface StatisticsProps {
 
 export function Statistics({ data, alertThreshold }: StatisticsProps) {
   const totalRevenues = data.reduce((sum, month) => {
+    const customRevenues = month.revenues.custom.reduce((revSum, rev) => revSum + rev.amount, 0);
     return sum + month.revenues.salary + month.revenues.fuel + 
-           month.revenues.healthInsurance + month.revenues.bonus;
+           month.revenues.healthInsurance + month.revenues.bonus + customRevenues;
   }, 0);
 
   const totalExpenses = data.reduce((sum, month) => {
@@ -37,10 +38,18 @@ export function Statistics({ data, alertThreshold }: StatisticsProps) {
     custom: data.reduce((sum, month) => sum + month.expenses.custom.reduce((expSum, exp) => expSum + exp.amount, 0), 0),
     chantier: data.reduce((sum, month) => sum + month.expenses.chantier, 0),
   };
-
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Statistiques globales</h2>
+      
+      {/* Explanation note */}
+      <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <p className="text-sm text-blue-800 dark:text-blue-200">
+          💡 <strong>Note importante :</strong> Les salaires et bonus sont versés en fin de mois et comptabilisés comme disponibles le mois suivant.
+          <br />
+          Par exemple : le salaire de juillet (versé le 31/07) est utilisable pour couvrir les dépenses d'août.
+        </p>
+      </div>
       
       {/* Key metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
