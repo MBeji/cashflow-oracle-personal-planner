@@ -26,6 +26,15 @@ const defaultExpenseSettings: ExpenseSettings = {
   monthlyBreakdowns: []
 };
 
+// Fonction pour générer les dépenses de vacances par défaut pour l'année courante
+const getDefaultVacationExpenses = () => {
+  const currentYear = new Date().getFullYear();
+  return {
+    [`${currentYear}-07`]: 3500, // Juillet année courante
+    [`${currentYear}-08`]: 3500  // Août année courante
+  };
+};
+
 const defaultFixedAmounts: FixedAmounts = {
   salary: 12750,
   fuelRevenue: 500,
@@ -51,9 +60,8 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
     customRecurringExpenses: [],
     fixedAmounts: defaultFixedAmounts,
     expenseSettings: defaultExpenseSettings,
-  });
-  const [customExpenses, setCustomExpenses] = useState<CustomExpense[]>([]);
-  const [vacationExpenses, setVacationExpenses] = useState<{ [key: string]: number }>({});
+  });  const [customExpenses, setCustomExpenses] = useState<CustomExpense[]>([]);
+  const [vacationExpenses, setVacationExpenses] = useState<{ [key: string]: number }>(getDefaultVacationExpenses());
   const [chantierExpenses, setChantierExpenses] = useState<{ [key: string]: number }>({});
   const [customMonthlyExpenses, setCustomMonthlyExpenses] = useState<{ [key: string]: number }>({});
   const [monthlyCustomExpenses, setMonthlyCustomExpenses] = useState<{ [key: string]: MonthlyCustomExpense[] }>({});
@@ -66,7 +74,7 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
       savedSettings.fixedAmounts = defaultFixedAmounts;
     }
     const savedCustomExpenses = StorageService.load('cashflow-custom-expenses', []);
-    const savedVacationExpenses = StorageService.load('cashflow-vacation-expenses', {});
+    const savedVacationExpenses = StorageService.load('cashflow-vacation-expenses', getDefaultVacationExpenses());
     const savedChantierExpenses = StorageService.load('cashflow-chantier-expenses', {});
     const savedMonthlyExpenses = StorageService.load('cashflow-monthly-expenses', {});
     const savedMonthlyCustomExpenses = StorageService.load('cashflow-monthly-custom-expenses', {});
@@ -193,10 +201,9 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
         customRecurringExpenses: [],
         fixedAmounts: defaultFixedAmounts,
         expenseSettings: defaultExpenseSettings,
-      };
-      setSettings(defaultSettings);
+      };      setSettings(defaultSettings);
       setCustomExpenses([]);
-      setVacationExpenses({});
+      setVacationExpenses(getDefaultVacationExpenses());
       setChantierExpenses({});
       setCustomMonthlyExpenses({});
       setMonthlyCustomExpenses({});

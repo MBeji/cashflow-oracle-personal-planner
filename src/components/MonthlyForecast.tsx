@@ -452,20 +452,7 @@ export function MonthlyForecast({
                       >
                         + Ajouter vacances
                       </button>
-                    </div>
-                  )}
-                  
-                  {/* Bouton pour ajouter chantier seulement si pas encore configuré */}
-                  {!hasChantierExpense && (
-                    <div className="flex items-center justify-center">
-                      <button
-                        onClick={() => handleChantierChange(monthKey, '1000')}
-                        className="px-3 py-2 text-sm bg-orange-100 text-orange-700 rounded-md hover:bg-orange-200 transition-colors"
-                      >
-                        + Ajouter chantier
-                      </button>
-                    </div>
-                  )}
+                    </div>                  )}
 
                   {/* Bouton "+ Ajouter Dépenses" - toujours visible */}
                   <div className="flex items-center justify-center">
