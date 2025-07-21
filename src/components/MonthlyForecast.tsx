@@ -324,156 +324,153 @@ export function MonthlyForecast({
                         </div>
                       )}
                     </div>
+                  </div>                  {/* Section Dépenses Fixes */}
+                  <div>
+                    <h4 className="font-semibold text-destructive mb-2">Dépenses Fixes</h4>
+                    {(() => {
+                      const fixedExpenses = [];
+                      let fixedTotal = 0;
+                      
+                      if (!hiddenExpenses.includes('debt') && month.expenses.debt > 0) {
+                        fixedExpenses.push({ name: 'Dette', amount: month.expenses.debt, key: 'debt' });
+                        fixedTotal += month.expenses.debt;
+                      }
+                      
+                      if (!hiddenExpenses.includes('currentExpenses') && month.expenses.currentExpenses > 0) {
+                        fixedExpenses.push({ name: 'Dép. courantes', amount: month.expenses.currentExpenses, key: 'currentExpenses' });
+                        fixedTotal += month.expenses.currentExpenses;
+                      }
+                      
+                      if (!hiddenExpenses.includes('fuel') && month.expenses.fuel > 0) {
+                        fixedExpenses.push({ name: 'Carburant', amount: month.expenses.fuel, key: 'fuel' });
+                        fixedTotal += month.expenses.fuel;
+                      }
+                      
+                      if (!hiddenExpenses.includes('healthInsurance') && month.expenses.healthInsurance > 0) {
+                        fixedExpenses.push({ name: 'Assurance', amount: month.expenses.healthInsurance, key: 'healthInsurance' });
+                        fixedTotal += month.expenses.healthInsurance;
+                      }
+                      
+                      return (
+                        <>
+                          <p className="text-lg text-destructive font-semibold">{formatCurrency(fixedTotal)}</p>
+                          <div className="mt-1 space-y-1 text-xs text-muted-foreground">
+                            {fixedExpenses.map(expense => (
+                              <div key={expense.key} className={cn(
+                                "flex items-center justify-between",
+                                isCurrentMonthData && "opacity-50 line-through"
+                              )}>
+                                <span>{expense.name}: {formatCurrency(expense.amount)}</span>
+                                <div className="flex items-center">
+                                  {isCurrentMonthData && (
+                                    <Minus className="w-3 h-3 text-muted-foreground mr-1" />
+                                  )}
+                                  {isCurrentMonthData && (
+                                    <button 
+                                      onClick={() => hideExpenseItem(monthKey, expense.key)}
+                                      className="ml-2 text-destructive hover:text-destructive/80"
+                                    >
+                                      <X className="w-3 h-3" />
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                            {isCurrentMonthData && fixedExpenses.length > 0 && (
+                              <div className="text-xs text-muted-foreground italic mt-2">
+                                <Minus className="w-3 h-3 inline mr-1" />
+                                Dépenses fixes exclues du calcul (mois en cours)
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      );
+                    })()}
                   </div>
-                    <div>
-                    <h4 className="font-semibold text-destructive mb-2">Dépenses fixes</h4>
-                    <div className="mt-1 space-y-1 text-xs text-muted-foreground">                      {!hiddenExpenses.includes('debt') && (
-                        <div className={cn(
-                          "flex items-center justify-between",
-                          isCurrentMonthData && "opacity-50 line-through"
-                        )}>
-                          <span>Dette: {formatCurrency(month.expenses.debt)}</span>
-                          <div className="flex items-center">
-                            {isCurrentMonthData && (
-                              <Minus className="w-3 h-3 text-muted-foreground mr-1" />
-                            )}
-                            {isCurrentMonthData && (
-                              <button 
-                                onClick={() => hideExpenseItem(monthKey, 'debt')}
-                                className="ml-2 text-destructive hover:text-destructive/80"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      )}                      {!hiddenExpenses.includes('currentExpenses') && (
-                        <div className={cn(
-                          "flex items-center justify-between",
-                          isCurrentMonthData && "opacity-50 line-through"
-                        )}>
-                          <span>Dép. courantes: {formatCurrency(month.expenses.currentExpenses)}</span>
-                          <div className="flex items-center">
-                            {isCurrentMonthData && (
-                              <Minus className="w-3 h-3 text-muted-foreground mr-1" />
-                            )}
-                            {isCurrentMonthData && (
-                              <button 
-                                onClick={() => hideExpenseItem(monthKey, 'currentExpenses')}
-                                className="ml-2 text-destructive hover:text-destructive/80"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      )}                      {!hiddenExpenses.includes('fuel') && (
-                        <div className={cn(
-                          "flex items-center justify-between",
-                          isCurrentMonthData && "opacity-50 line-through"
-                        )}>
-                          <span>Carburant: {formatCurrency(month.expenses.fuel)}</span>
-                          <div className="flex items-center">
-                            {isCurrentMonthData && (
-                              <Minus className="w-3 h-3 text-muted-foreground mr-1" />
-                            )}
-                            {isCurrentMonthData && (
-                              <button 
-                                onClick={() => hideExpenseItem(monthKey, 'fuel')}
-                                className="ml-2 text-destructive hover:text-destructive/80"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      )}                      {!hiddenExpenses.includes('healthInsurance') && (
-                        <div className={cn(
-                          "flex items-center justify-between",
-                          isCurrentMonthData && "opacity-50 line-through"
-                        )}>
-                          <span>Assurance: {formatCurrency(month.expenses.healthInsurance)}</span>
-                          <div className="flex items-center">
-                            {isCurrentMonthData && (
-                              <Minus className="w-3 h-3 text-muted-foreground mr-1" />
-                            )}
-                            {isCurrentMonthData && (
-                              <button 
-                                onClick={() => hideExpenseItem(monthKey, 'healthInsurance')}
-                                className="ml-2 text-destructive hover:text-destructive/80"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                      {month.expenses.school > 0 && (
-                        <div>École: {formatCurrency(month.expenses.school)}</div>
-                      )}
-                      {month.expenses.custom.map((exp, i) => (
-                        <div key={i}>{exp.name}: {formatCurrency(exp.amount)}</div>
-                      ))}
-                      {isCurrentMonthData && (
-                        <div className="text-xs text-muted-foreground italic mt-2">
-                          <Minus className="w-3 h-3 inline mr-1" />
-                          Dépenses fixes exclues du calcul (mois en cours)
-                        </div>
-                      )}
-                    </div>                  </div>
 
-                  {/* Colonne Vacances - seulement si applicable ou configurée */}
-                  {hasVacationExpense && (
-                    <div>
-                      <h4 className="font-semibold text-warning mb-2">Vacances</h4>
-                      {canEditVacation ? (
-                        <Input
-                          type="number"
-                          value={vacationAmount}
-                          onChange={(e) => handleVacationChange(monthKey, e.target.value)}
-                          placeholder="0"
-                          className="w-full text-sm"
-                        />
-                      ) : (
-                        <p className="text-sm">{formatCurrency(vacationAmount)}</p>
-                      )}
-                      {vacationAmount > 0 && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {formatCurrency(vacationAmount)}
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Colonne Chantier - seulement si configurée */}
-                  {hasChantierExpense && (
-                    <div>
-                      <h4 className="font-semibold text-warning mb-2">Chantier</h4>
-                      <Input
-                        type="number"
-                        value={chantierAmount}
-                        onChange={(e) => handleChantierChange(monthKey, e.target.value)}
-                        placeholder="0"
-                        className="w-full text-sm"
-                      />
-                      {chantierAmount > 0 && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {formatCurrency(chantierAmount)}
-                        </p>
-                      )}
-                    </div>
-                  )}                  {/* Boutons pour ajouter des colonnes si elles ne sont pas visibles */}
-                  {!hasVacationExpense && canEditVacation && (
-                    <div className="flex items-center justify-center">
-                      <button
-                        onClick={() => handleVacationChange(monthKey, '1000')}
-                        className="px-3 py-2 text-sm bg-orange-100 text-orange-700 rounded-md hover:bg-orange-200 transition-colors"
-                      >
-                        + Ajouter vacances
-                      </button>
-                    </div>                  )}
-
-                  {/* Bouton "+ Ajouter Dépenses" - toujours visible */}
+                  {/* Section Dépenses Spécifiques */}
+                  <div>
+                    <h4 className="font-semibold text-orange-600 mb-2">Dépenses Spécifiques</h4>
+                    {(() => {
+                      const specificExpenses = [];
+                      let specificTotal = 0;
+                        // École
+                      if (month.expenses.school > 0) {
+                        specificExpenses.push({ name: 'École', amount: month.expenses.school, editable: false });
+                        specificTotal += month.expenses.school;
+                      }
+                      
+                      // Vacances (déjà incluses dans month.expenses.vacation)
+                      if (month.expenses.vacation > 0) {
+                        specificExpenses.push({ name: 'Vacances', amount: month.expenses.vacation, editable: canEditVacation });
+                        specificTotal += month.expenses.vacation;
+                      }
+                      
+                      // Chantier (déjà inclus dans month.expenses.chantier)
+                      if (month.expenses.chantier > 0) {
+                        specificExpenses.push({ name: 'Chantier', amount: month.expenses.chantier, editable: true });
+                        specificTotal += month.expenses.chantier;
+                      }// Dépenses personnalisées (custom expenses de base + monthlyCustomExpenses déjà fusionnées)
+                      month.expenses.custom.forEach(exp => {
+                        // Les dépenses mensuelles ajoutées ont isRecurring: false
+                        const isMonthlyExpense = !exp.isRecurring;
+                        specificExpenses.push({ 
+                          name: exp.name, 
+                          amount: exp.amount, 
+                          editable: false, 
+                          id: exp.id,
+                          isMonthly: isMonthlyExpense
+                        });
+                        specificTotal += exp.amount;
+                      });
+                      
+                      return (
+                        <>
+                          <p className="text-lg text-orange-600 font-semibold">{formatCurrency(specificTotal)}</p>
+                          <div className="mt-1 space-y-1 text-xs text-muted-foreground">
+                            {specificExpenses.map((expense, i) => (
+                              <div key={i} className="flex items-center justify-between">
+                                <span>{expense.name}: {formatCurrency(expense.amount)}</span>
+                                {expense.isMonthly && (
+                                  <button
+                                    onClick={() => onMonthlyCustomExpenseRemove(monthKey, expense.id)}
+                                    className="text-red-500 hover:text-red-700"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                )}
+                              </div>
+                            ))}                              {/* Champs éditables pour Vacances et Chantier */}
+                            {canEditVacation && (
+                              <div className="mt-2">
+                                <label className="text-xs font-medium">Vacances:</label>
+                                <Input
+                                  type="number"
+                                  value={month.expenses.vacation}
+                                  onChange={(e) => handleVacationChange(monthKey, e.target.value)}
+                                  placeholder="0"
+                                  className="w-full text-sm mt-1"
+                                />
+                              </div>
+                            )}
+                              {/* Champ Chantier uniquement si il y a déjà une valeur configurée ou si on est dans un mois éditable */}
+                            {(month.expenses.chantier > 0 || chantierAmount > 0) && (
+                              <div className="mt-2">
+                                <label className="text-xs font-medium">Chantier:</label>
+                                <Input
+                                  type="number"
+                                  value={month.expenses.chantier}
+                                  onChange={(e) => handleChantierChange(monthKey, e.target.value)}
+                                  placeholder="0"
+                                  className="w-full text-sm mt-1"
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>{/* Bouton "+ Ajouter Dépenses" - toujours visible */}
                   <div className="flex items-center justify-center">
                     <button
                       onClick={() => toggleExpenseForm(monthKey)}
@@ -523,26 +520,6 @@ export function MonthlyForecast({
                             Annuler
                           </Button>
                         </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Liste des dépenses personnalisées du mois */}
-                  {monthlyCustomExpenses[monthKey] && monthlyCustomExpenses[monthKey].length > 0 && (
-                    <div>
-                      <h4 className="font-semibold text-purple-700 mb-2">Dépenses ajoutées</h4>
-                      <div className="space-y-1">
-                        {monthlyCustomExpenses[monthKey].map((expense) => (
-                          <div key={expense.id} className="flex items-center justify-between text-xs bg-purple-50 p-2 rounded">
-                            <span>{expense.type}: {formatCurrency(expense.amount)}</span>
-                            <button
-                              onClick={() => onMonthlyCustomExpenseRemove(monthKey, expense.id)}
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </div>
-                        ))}
                       </div>
                     </div>                  )}
 

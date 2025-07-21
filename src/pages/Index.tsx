@@ -82,13 +82,9 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
   const [monthlyCustomExpenses, setMonthlyCustomExpenses] = useState<{ [key: string]: MonthlyCustomExpense[] }>({});
   const [viewMode, setViewMode] = useState<'detailed' | 'compact'>('detailed');
   const [selectedMonthIndex, setSelectedMonthIndex] = useState<number | null>(null);
-
   // État pour gérer les prévisions de dépenses du mois en cours
-  // Initialisé avec les dépenses fixes (sans vacation, chantier)
-  const [currentMonthExpenseForecast, setCurrentMonthExpenseForecast] = useState<number>(() => {
-    const { debt, currentExpenses, fuelExpense, healthInsuranceExpense } = defaultFixedAmounts;
-    return debt + currentExpenses + fuelExpense + healthInsuranceExpense;
-  });
+  // Initialisé à 0 par défaut
+  const [currentMonthExpenseForecast, setCurrentMonthExpenseForecast] = useState<number>(0);
   // Charger les données au démarrage
   useEffect(() => {
     const savedSettings = StorageService.load('cashflow-settings', settings);
@@ -99,17 +95,13 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
     const savedCustomExpenses = StorageService.load('cashflow-custom-expenses', []);
     const savedVacationExpenses = StorageService.load('cashflow-vacation-expenses', getDefaultVacationExpenses());
     const savedChantierExpenses = StorageService.load('cashflow-chantier-expenses', {});
-    const savedMonthlyCustomExpenses = StorageService.load('cashflow-monthly-custom-expenses', {});
-
-    setSettings(savedSettings);
+    const savedMonthlyCustomExpenses = StorageService.load('cashflow-monthly-custom-expenses', {});    setSettings(savedSettings);
     setCustomExpenses(savedCustomExpenses);
     setVacationExpenses(savedVacationExpenses);
     setChantierExpenses(savedChantierExpenses);
     setMonthlyCustomExpenses(savedMonthlyCustomExpenses);
     
-    // Initialiser currentMonthExpenseForecast avec les fixedAmounts chargés
-    const { debt, currentExpenses, fuelExpense, healthInsuranceExpense } = savedSettings.fixedAmounts;
-    setCurrentMonthExpenseForecast(debt + currentExpenses + fuelExpense + healthInsuranceExpense);
+    // currentMonthExpenseForecast reste à 0 par défaut
   }, []);
 
   // Sauvegarder automatiquement
@@ -245,7 +237,7 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
             💰 Cash Flow Personnel
           </h1>
           <p className="text-lg text-muted-foreground">
-            Prévision et suivi sur 20 mois de votre trésorerie personnelle
+            Prévision et suivi de votre trésorerie personnelle
           </p>
         </div>        {/* Solde actuel - Maintenant dans la page principale */}
         <div className="mb-6 max-w-md mx-auto">
