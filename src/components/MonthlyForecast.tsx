@@ -6,11 +6,16 @@ import { formatCurrency, getMonthName, isLowBalance } from '@/utils/cashflow';
 import { cn } from '@/lib/utils';
 import { X, Minus, Plus } from 'lucide-react';
 import { useState } from 'react';
+import { CurrentMonthCard } from './CurrentMonthCard';
 
 interface MonthlyForecastProps {
   data: MonthlyData[];
   alertThreshold: number;
   monthsToDisplay: number;
+  currentBalance: number;
+  onCurrentBalanceChange: (value: number) => void;
+  onCurrentMonthExpenseForecastChange?: (forecast: number) => void;
+  currentMonthExpenseForecast?: number;
   onVacationChange: (monthKey: string, amount: number) => void;
   onChantierChange: (monthKey: string, amount: number) => void;
   onMonthlyCustomExpenseAdd: (monthKey: string, expense: MonthlyCustomExpense) => void;
@@ -24,6 +29,10 @@ export function MonthlyForecast({
   data, 
   alertThreshold, 
   monthsToDisplay,
+  currentBalance,
+  onCurrentBalanceChange,
+  onCurrentMonthExpenseForecastChange,
+  currentMonthExpenseForecast = 0,
   onVacationChange, 
   onChantierChange, 
   onMonthlyCustomExpenseAdd,
@@ -144,7 +153,21 @@ export function MonthlyForecast({
         </div>
       </div>
       
-      <div className="grid gap-4">        {data.map((month, index) => {
+      <div className="space-y-4">        {/* Mois en cours - Affichage spécialisé */}
+        {data.length > 0 && (
+          <CurrentMonthCard
+            currentBalance={currentBalance}
+            onCurrentBalanceChange={onCurrentBalanceChange}
+            monthData={data[0]}
+            alertThreshold={alertThreshold}
+            onExpenseForecastChange={onCurrentMonthExpenseForecastChange}
+            initialExpenseForecast={currentMonthExpenseForecast}
+          />
+        )}
+        
+        {/* Mois suivants - Affichage standard */}
+        <div className="grid gap-4">
+        {data.slice(1).map((month, index) => {
           const monthKey = `${month.year}-${month.month.toString().padStart(2, '0')}`;
           const isCurrentMonthData = isCurrentMonth(month.month, month.year);
           const hiddenRevenues = hiddenRevenueItems[monthKey] || [];
@@ -521,8 +544,7 @@ export function MonthlyForecast({
                           </div>
                         ))}
                       </div>
-                    </div>
-                  )}
+                    </div>                  )}
 
                   {/* Colonne Total dépenses */}
                   <div>
@@ -534,6 +556,7 @@ export function MonthlyForecast({
             </Card>
           );
         })}
+        </div>
       </div>
     </div>
   );

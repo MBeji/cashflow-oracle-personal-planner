@@ -42,14 +42,18 @@ describe('MonthlyForecast Component', () => {
     vacationExpenses: {},
     chantierExpenses: {},
     customExpenses: {},
-    monthlyCustomExpenses: {}
-  };  it('should render monthly forecast correctly', () => {
+    monthlyCustomExpenses: {},
+    currentBalance: 10000,
+    onCurrentBalanceChange: vi.fn()
+  };
+
+  it('should render monthly forecast correctly', () => {
     render(<MonthlyForecast {...defaultProps} />);
     
     expect(screen.getByText('Prévision sur 12 mois')).toBeInTheDocument();
     expect(screen.getByText('Juillet 2025')).toBeInTheDocument();
-    // Vérifier qu'au moins une occurrence de "10,000 TND" est présente
-    expect(screen.getByText('10,000 TND')).toBeInTheDocument();
+    // For current month, the balance is shown in the CurrentMonthCard as "Solde fin de mois"
+    expect(screen.getByText('11,750 TND')).toBeInTheDocument();
   });
   it('should show vacation input for July and August', () => {
     render(<MonthlyForecast {...defaultProps} />);
@@ -58,17 +62,17 @@ describe('MonthlyForecast Component', () => {
     const inputs = screen.getAllByPlaceholderText('0');
     expect(inputs.length).toBeGreaterThan(0);
   });
-
   it('should show "+ Ajouter Dépenses" button', () => {
     render(<MonthlyForecast {...defaultProps} />);
     
-    expect(screen.getByText('+ Ajouter Dépenses')).toBeInTheDocument();
+    // The button text in CurrentMonthCard is "Ajouter une dépense"
+    expect(screen.getByText('Ajouter une dépense')).toBeInTheDocument();
   });
-
   it('should show expense form when "+ Ajouter Dépenses" is clicked', () => {
     render(<MonthlyForecast {...defaultProps} />);
     
-    const addButton = screen.getByText('+ Ajouter Dépenses');
+    // Click the CurrentMonthCard's add button
+    const addButton = screen.getByText('Ajouter une dépense');
     fireEvent.click(addButton);
     
     expect(screen.getByPlaceholderText('Type de dépense')).toBeInTheDocument();
@@ -76,17 +80,16 @@ describe('MonthlyForecast Component', () => {
     expect(screen.getByText('Ajouter')).toBeInTheDocument();
     expect(screen.getByText('Annuler')).toBeInTheDocument();
   });
-
   it('should call onMonthlyCustomExpenseAdd when expense is added', () => {
     const onMonthlyCustomExpenseAdd = vi.fn();
     const props = { ...defaultProps, onMonthlyCustomExpenseAdd };
     
     render(<MonthlyForecast {...props} />);
     
-    // Ouvrir le formulaire
-    fireEvent.click(screen.getByText('+ Ajouter Dépenses'));
+    // Open form in CurrentMonthCard
+    fireEvent.click(screen.getByText('Ajouter une dépense'));
     
-    // Remplir le formulaire
+    // Fill form
     fireEvent.change(screen.getByPlaceholderText('Type de dépense'), {
       target: { value: 'Réparation' }
     });
@@ -94,18 +97,17 @@ describe('MonthlyForecast Component', () => {
       target: { value: '500' }
     });
     
-    // Soumettre
+    // Submit
     fireEvent.click(screen.getByText('Ajouter'));
-    
-    expect(onMonthlyCustomExpenseAdd).toHaveBeenCalledWith(
+      expect(onMonthlyCustomExpenseAdd).toHaveBeenCalledWith(
       '2025-07',
       expect.objectContaining({
         type: 'Réparation',
-        amount: 500
+        amount: 500,
+        id: expect.any(String)
       })
     );
   });
-
   it('should display monthly custom expenses', () => {
     const monthlyCustomExpenses = {
       '2025-07': [
@@ -117,11 +119,12 @@ describe('MonthlyForecast Component', () => {
     const props = { ...defaultProps, monthlyCustomExpenses };
     render(<MonthlyForecast {...props} />);
     
-    expect(screen.getByText('Dépenses ajoutées')).toBeInTheDocument();
-    expect(screen.getByText('Réparation voiture: 800 TND')).toBeInTheDocument();
-    expect(screen.getByText('Cadeau: 200 TND')).toBeInTheDocument();
-  });
-  it('should call onMonthlyCustomExpenseRemove when expense is removed', () => {
+    // In CurrentMonthCard, custom expenses are shown directly without a "Dépenses ajoutées" header
+    expect(screen.getByText('Réparation voiture')).toBeInTheDocument();
+    expect(screen.getByText('Cadeau')).toBeInTheDocument();
+    expect(screen.getByText('800 TND')).toBeInTheDocument();
+    expect(screen.getByText('200 TND')).toBeInTheDocument();
+  });  it('should call onMonthlyCustomExpenseRemove when expense is removed', () => {
     const onMonthlyCustomExpenseRemove = vi.fn();
     const monthlyCustomExpenses = {
       '2025-07': [
@@ -137,17 +140,18 @@ describe('MonthlyForecast Component', () => {
     
     render(<MonthlyForecast {...props} />);
     
-    // Chercher le bouton de suppression dans la section des dépenses ajoutées
-    const expenseItem = screen.getByText('Réparation voiture: 800 TND');
-    const container = expenseItem.closest('.flex');
-    if (container) {
-      const removeButton = container.querySelector('button');
+    // Find the expense in CurrentMonthCard structure
+    const expenseText = screen.getByText('Réparation voiture');
+    const expenseContainer = expenseText.closest('.group');
+    
+    if (expenseContainer) {
+      const removeButton = expenseContainer.querySelector('button');
       if (removeButton) {
         fireEvent.click(removeButton);
         expect(onMonthlyCustomExpenseRemove).toHaveBeenCalledWith('2025-07', '1');
       }
     }
-  });  it('should handle low balance alert correctly', () => {
+  });it('should handle low balance alert correctly', () => {
     // Ce test vérifie que l'alerte fonctionne en principe 
     // Le calcul réel se fait dans le composant et dépend des états internes
     const props = { ...defaultProps, alertThreshold: 2000 };
@@ -156,9 +160,8 @@ describe('MonthlyForecast Component', () => {
     // Vérifier que la légende d'alerte est présente
     expect(screen.getByText('Alerte')).toBeInTheDocument();
   });
-
   it('should exclude fixed revenues for current month', () => {
-    // Créer des données pour le mois actuel (juillet 2025)
+    // Create data for current month (July 2025)
     const currentMonthData = [{
       month: 7,
       year: 2025,
@@ -186,8 +189,10 @@ describe('MonthlyForecast Component', () => {
     const props = { ...defaultProps, data: currentMonthData };
     render(<MonthlyForecast {...props} />);
     
-    // Vérifier que les éléments du mois en cours sont marqués comme exclus
-    expect(screen.getByText('Revenus fixes exclus du calcul (mois en cours)')).toBeInTheDocument();
-    expect(screen.getByText('Dépenses fixes exclues du calcul (mois en cours)')).toBeInTheDocument();
+    // In CurrentMonthCard, fixed revenues and expenses are excluded from calculation but we don't show specific exclusion messages
+    // Instead, we verify that the current month uses CurrentMonthCard (has "Mois actuel" badge)
+    expect(screen.getByText('Mois actuel')).toBeInTheDocument();
+    // And verify it shows variable expenses section instead of fixed ones
+    expect(screen.getByText('Dépenses variables')).toBeInTheDocument();
   });
 });

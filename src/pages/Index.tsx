@@ -81,8 +81,17 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
   const [chantierExpenses, setChantierExpenses] = useState<{ [key: string]: number }>({});
   const [monthlyCustomExpenses, setMonthlyCustomExpenses] = useState<{ [key: string]: MonthlyCustomExpense[] }>({});
   const [viewMode, setViewMode] = useState<'detailed' | 'compact'>('detailed');
-  const [selectedMonthIndex, setSelectedMonthIndex] = useState<number | null>(null);  // Charger les données au démarrage
-  useEffect(() => {    const savedSettings = StorageService.load('cashflow-settings', settings);
+  const [selectedMonthIndex, setSelectedMonthIndex] = useState<number | null>(null);
+
+  // État pour gérer les prévisions de dépenses du mois en cours
+  // Initialisé avec les dépenses fixes (sans vacation, chantier)
+  const [currentMonthExpenseForecast, setCurrentMonthExpenseForecast] = useState<number>(() => {
+    const { debt, currentExpenses, fuelExpense, healthInsuranceExpense } = defaultFixedAmounts;
+    return debt + currentExpenses + fuelExpense + healthInsuranceExpense;
+  });
+  // Charger les données au démarrage
+  useEffect(() => {
+    const savedSettings = StorageService.load('cashflow-settings', settings);
     // S'assurer que fixedAmounts existe dans les données chargées
     if (!savedSettings.fixedAmounts) {
       savedSettings.fixedAmounts = defaultFixedAmounts;
@@ -97,6 +106,10 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
     setVacationExpenses(savedVacationExpenses);
     setChantierExpenses(savedChantierExpenses);
     setMonthlyCustomExpenses(savedMonthlyCustomExpenses);
+    
+    // Initialiser currentMonthExpenseForecast avec les fixedAmounts chargés
+    const { debt, currentExpenses, fuelExpense, healthInsuranceExpense } = savedSettings.fixedAmounts;
+    setCurrentMonthExpenseForecast(debt + currentExpenses + fuelExpense + healthInsuranceExpense);
   }, []);
 
   // Sauvegarder automatiquement
@@ -139,12 +152,18 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
       settings.customRevenues,
       settings.fixedAmounts,
       monthlyCustomExpenses,
-      settings.expenseSettings
+      settings.expenseSettings,
+      currentMonthExpenseForecast
     );
-  }, [settings, customExpenses, chantierExpenses, vacationExpenses, monthlyCustomExpenses]);
+  }, [settings, customExpenses, chantierExpenses, vacationExpenses, monthlyCustomExpenses, currentMonthExpenseForecast]);
 
   const handleCurrentBalanceChange = (value: number) => {
     setSettings(prev => ({ ...prev, currentBalance: value }));
+  };
+
+  // Handler pour gérer les changements de prévision de dépenses du mois en cours
+  const handleCurrentMonthExpenseForecastChange = (forecast: number) => {
+    setCurrentMonthExpenseForecast(forecast);
   };
 
   const handleAlertThresholdChange = (value: number) => {
@@ -294,11 +313,14 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
                 }}
                 vacationExpenses={vacationExpenses}
                 chantierExpenses={chantierExpenses}
-              />
-            ) : (              <MonthlyForecast 
+              />            ) : (              <MonthlyForecast 
                 data={monthlyData} 
                 alertThreshold={settings.alertThreshold}
                 monthsToDisplay={settings.monthsToDisplay}
+                currentBalance={settings.currentBalance}
+                onCurrentBalanceChange={handleCurrentBalanceChange}
+                onCurrentMonthExpenseForecastChange={handleCurrentMonthExpenseForecastChange}
+                currentMonthExpenseForecast={currentMonthExpenseForecast}
                 onVacationChange={handleVacationChange}
                 onChantierChange={handleChantierChange}
                 onMonthlyCustomExpenseAdd={handleMonthlyCustomExpenseAdd}

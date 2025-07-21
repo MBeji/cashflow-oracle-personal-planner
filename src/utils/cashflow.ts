@@ -11,7 +11,8 @@ export function calculateMonthlyData(
   customRevenues: CustomRevenue[] = [],
   fixedAmounts: FixedAmounts,
   monthlyCustomExpenses: { [key: string]: MonthlyCustomExpense[] } = {},
-  expenseSettings?: ExpenseSettings
+  expenseSettings?: ExpenseSettings,
+  currentMonthExpenseForecast?: number
 ): MonthlyData[] {
   const result: MonthlyData[] = [];
   let currentBalance = initialBalance;  for (let i = 0; i < months; i++) {
@@ -104,10 +105,17 @@ export function calculateMonthlyData(
     };    // Calculate ending balance
     const totalRevenues = monthData.revenues.salary + monthData.revenues.fuel + monthData.revenues.healthInsurance + monthData.revenues.bonus + totalCustomRevenues;
     
-    // Pour le calcul des dépenses totales, on utilise les valeurs réelles du monthData (qui sont déjà à 0 pour le mois en cours)
-    const totalExpenses = monthData.expenses.debt + monthData.expenses.currentExpenses + monthData.expenses.fuel + 
-                         monthData.expenses.healthInsurance + monthData.expenses.vacation + monthData.expenses.school + 
-                         monthData.expenses.custom.reduce((sum, exp) => sum + exp.amount, 0) + monthData.expenses.chantier;    monthData.endingBalance = currentBalance + totalRevenues - totalExpenses;
+    let totalExpenses;
+    
+    if (isCurrentMonth && currentMonthExpenseForecast !== undefined) {
+      // Pour le mois en cours, utiliser la prévision de dépenses si elle est fournie
+      totalExpenses = currentMonthExpenseForecast;
+    } else {
+      // Pour les autres mois, utiliser le calcul normal
+      totalExpenses = monthData.expenses.debt + monthData.expenses.currentExpenses + monthData.expenses.fuel + 
+                     monthData.expenses.healthInsurance + monthData.expenses.vacation + monthData.expenses.school + 
+                     monthData.expenses.custom.reduce((sum, exp) => sum + exp.amount, 0) + monthData.expenses.chantier;
+    }monthData.endingBalance = currentBalance + totalRevenues - totalExpenses;
     
     currentBalance = monthData.endingBalance;
 
