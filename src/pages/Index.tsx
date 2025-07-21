@@ -20,6 +20,7 @@ import { MobileNumberInput } from '@/components/MobileNumberInput';
 import { calculateMonthlyData } from '@/utils/cashflow';
 import { StorageService } from '@/utils/storage';
 import { useMobileDetection } from '@/hooks/useMobile';
+import { detectAndFixIOS } from '@/utils/iosFixes';
 import { CashFlowSettings as Settings, CustomExpense, FixedAmounts, MonthlyCustomExpense, ExpenseSettings } from '@/types/cashflow';
 import { Calculator, TrendingUp, Settings as SettingsIcon, LayoutGrid, List } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -91,8 +92,7 @@ const Index = () => {
   const [selectedMonthIndex, setSelectedMonthIndex] = useState<number | null>(null);
   // État pour gérer les prévisions de dépenses du mois en cours
   // Initialisé à 0 par défaut
-  const [currentMonthExpenseForecast, setCurrentMonthExpenseForecast] = useState<number>(0);
-  // Charger les données au démarrage
+  const [currentMonthExpenseForecast, setCurrentMonthExpenseForecast] = useState<number>(0);  // Charger les données au démarrage
   useEffect(() => {
     const savedSettings = StorageService.load('cashflow-settings', settings);
     // S'assurer que fixedAmounts existe dans les données chargées
@@ -109,6 +109,11 @@ const Index = () => {
     setMonthlyCustomExpenses(savedMonthlyCustomExpenses);
     
     // currentMonthExpenseForecast reste à 0 par défaut
+  }, []);
+
+  // Initialiser les corrections iOS au chargement
+  useEffect(() => {
+    detectAndFixIOS();
   }, []);
 
   // Sauvegarder automatiquement

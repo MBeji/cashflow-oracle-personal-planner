@@ -1,5 +1,53 @@
 /* Améliorations spécifiques pour l'expérience mobile */
 
+/* Corrections spécifiques iOS/iPhone */
+/* Fix pour Safari iOS - Support des CSS variables et viewport */
+:root {
+  /* Hauteur de viewport réelle sur iOS (évite les barres d'adresse) */
+  --vh: 1vh;
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+}
+
+/* Support du Safe Area pour iPhone X+ avec encoche */
+@supports (padding: env(safe-area-inset-top)) {
+  .mobile-tabs-bottom {
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+  }
+  
+  .mobile-content {
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Fix pour le viewport height sur iOS Safari */
+@media screen and (max-width: 768px) {
+  html, body {
+    height: 100%;
+    height: calc(var(--vh, 1vh) * 100);
+    overflow-x: hidden;
+  }
+  
+  /* Éviter le bounce scroll sur iOS */
+  body {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none;
+    position: fixed;
+    width: 100%;
+  }
+  
+  #root {
+    height: 100%;
+    height: calc(var(--vh, 1vh) * 100);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 /* Variables pour les breakpoints mobile */
 @media (max-width: 640px) {
   :root {
@@ -22,11 +70,18 @@
     border-top: 1px solid hsl(var(--border));
     padding: 0.5rem;
     box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+    /* Fix iOS Safari */
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    /* Éviter que les éléments passent derrière */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
   }
-
   /* Contenu principal avec espace pour la navigation */
   .mobile-content {
-    padding-bottom: 80px;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    min-height: calc(100vh - 80px);
+    min-height: calc(calc(var(--vh, 1vh) * 100) - 80px);
   }
 
   /* Boutons d'onglets plus larges */
@@ -34,6 +89,11 @@
     min-height: var(--touch-target-min);
     padding: 0.75rem 0.5rem;
     font-size: 0.875rem;
+    /* Améliorer la réactivité tactile sur iOS */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
   }
 }
 
@@ -43,7 +103,13 @@
   .mobile-input {
     min-height: var(--touch-target-min);
     font-size: 16px; /* Évite le zoom sur iOS */
-    padding: 0.75rem;
+    padding: 0.75rem;    /* Corrections iOS spécifiques */
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-border-radius: 0;
+    border-radius: 0.375rem;
+    /* Éviter les styles natifs iOS */
+    background-clip: padding-box;
   }
 
   /* Boutons avec zone tactile optimisée */
@@ -51,6 +117,14 @@
     min-height: var(--touch-target-min);
     padding: 0.75rem 1rem;
     margin: 0.25rem;
+    /* Améliorer les interactions tactiles iOS */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    /* Force l'accélération matérielle */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
   }
 
   /* Cards plus compactes */
@@ -169,5 +243,85 @@
   .mobile-tabs-bottom {
     background: hsl(var(--background));
     border-top-color: hsl(var(--border));
+  }
+}
+
+/* Corrections supplémentaires pour iOS Safari */
+@media screen and (max-width: 768px) {
+  /* Fix pour les éléments qui débordent sur iOS */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Éviter le défilement horizontal non désiré */
+  html {
+    overflow-x: hidden;
+  }
+  
+  /* Améliorer les performances de défilement */
+  .mobile-card, .mobile-button, .mobile-tab-trigger {
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  
+  /* Fix pour les input de type number sur iOS */
+  input[type="number"] {
+    -moz-appearance: textfield;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  /* Éviter le zoom automatique sur focus des inputs */
+  input, select, textarea, button {
+    font-size: 16px !important;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Fix pour les animations qui lag sur iOS */
+  .mobile-transition {
+    transition: all 0.2s ease-in-out;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  
+  /* Optimiser le rendu des ombres sur iOS */
+  .mobile-tabs-bottom {
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Media query spécifique pour iPhone en mode paysage */
+@media screen and (max-width: 926px) and (orientation: landscape) {
+  .mobile-tabs-bottom {
+    height: 60px;
+    padding: 0.25rem;
+  }
+  
+  .mobile-tab-trigger {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.75rem;
+  }
+  
+  .mobile-content {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Fix pour le JavaScript detection de la hauteur de viewport sur iOS */
+@media screen and (max-width: 768px) {
+  .js-mobile-vh-fix {
+    height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
   }
 }
