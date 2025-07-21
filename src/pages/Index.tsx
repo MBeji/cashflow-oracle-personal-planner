@@ -15,10 +15,14 @@ import { CompactView } from '@/components/CompactView';
 import { FixedAmountsManager } from '@/components/FixedAmountsManager';
 import { ExpenseCategoriesManager } from '@/components/ExpenseCategoriesManager';
 import { ExpenseStats } from '@/components/ExpenseStats';
+import { MobileOptimizedTabs } from '@/components/MobileOptimizedTabs';
+import { MobileNumberInput } from '@/components/MobileNumberInput';
 import { calculateMonthlyData } from '@/utils/cashflow';
 import { StorageService } from '@/utils/storage';
+import { useMobileDetection } from '@/hooks/useMobile';
 import { CashFlowSettings as Settings, CustomExpense, FixedAmounts, MonthlyCustomExpense, ExpenseSettings } from '@/types/cashflow';
 import { Calculator, TrendingUp, Settings as SettingsIcon, LayoutGrid, List } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const defaultExpenseSettings: ExpenseSettings = {
   defaultCategories: [
@@ -68,7 +72,10 @@ const defaultFixedAmounts: FixedAmounts = {
   schoolExpense: 15000
 };
 
-const Index = () => {  const [settings, setSettings] = useState<Settings>({
+const Index = () => {
+  const { isMobile, isTablet } = useMobileDetection();
+  
+  const [settings, setSettings] = useState<Settings>({
     currentBalance: 3500,
     alertThreshold: 2000,
     monthsToDisplay: 20,
@@ -228,161 +235,296 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
       alert('Données réinitialisées !');
     }
   };
-
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-foreground mb-2">
+      <div className={cn(
+        "container mx-auto max-w-7xl",
+        isMobile ? "px-2 py-4" : "px-4 py-8"
+      )}>
+        {/* En-tête adaptatif */}
+        <div className={cn(
+          "mb-6 text-center",
+          isMobile && "mb-4"
+        )}>
+          <h1 className={cn(
+            "font-bold text-foreground mb-2",
+            isMobile ? "text-2xl" : "text-4xl"
+          )}>
             💰 Cash Flow Personnel
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className={cn(
+            "text-muted-foreground",
+            isMobile ? "text-sm" : "text-lg"
+          )}>
             Prévision et suivi de votre trésorerie personnelle
           </p>
-        </div>        {/* Solde actuel - Maintenant dans la page principale */}
-        <div className="mb-6 max-w-md mx-auto">
-          <div className="space-y-2">
-            <label htmlFor="currentBalance" className="text-sm font-medium">
-              Solde actuel (TND)
-            </label>
-            <p className="text-xs text-muted-foreground mb-2">
-              💡 Les salaires et bonus sont versés en fin de mois et disponibles le mois suivant
-            </p>
-            <input
-              id="currentBalance"
-              type="number"
-              value={settings.currentBalance}
-              onChange={(e) => handleCurrentBalanceChange(Number(e.target.value))}
-              className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-          </div>
         </div>
 
-        <Tabs defaultValue="forecast" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="forecast" className="flex items-center gap-2">
-              <Calculator className="h-4 w-4" />
-              Prévisions
-            </TabsTrigger>
-            <TabsTrigger value="statistics" className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Statistiques
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
-              <SettingsIcon className="h-4 w-4" />
-              Paramètres
-            </TabsTrigger>
-          </TabsList>          <TabsContent value="forecast" className="space-y-6">
-            <FinancialSummary data={monthlyData} alertThreshold={settings.alertThreshold} />
-            <CashFlowChart data={monthlyData} alertThreshold={settings.alertThreshold} />
-            
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold">Détail mensuel</h3>
-              <div className="flex space-x-2">
-                <Button
-                  variant={viewMode === 'compact' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setViewMode('compact')}
-                >
-                  <LayoutGrid className="w-4 h-4 mr-2" />
-                  Compact
-                </Button>
-                <Button
-                  variant={viewMode === 'detailed' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setViewMode('detailed')}
-                >
-                  <List className="w-4 h-4 mr-2" />
-                  Détaillé
-                </Button>
-              </div>
-            </div>            {viewMode === 'compact' ? (              <CompactView 
-                data={monthlyData}
-                alertThreshold={settings.alertThreshold}
-                onMonthClick={(index) => {
-                  setSelectedMonthIndex(index);
-                  setViewMode('detailed');
-                }}
-                vacationExpenses={vacationExpenses}
-                chantierExpenses={chantierExpenses}
-              />            ) : (              <MonthlyForecast 
-                data={monthlyData} 
-                alertThreshold={settings.alertThreshold}
-                monthsToDisplay={settings.monthsToDisplay}
-                currentBalance={settings.currentBalance}
-                onCurrentBalanceChange={handleCurrentBalanceChange}
-                onCurrentMonthExpenseForecastChange={handleCurrentMonthExpenseForecastChange}
-                currentMonthExpenseForecast={currentMonthExpenseForecast}
-                onVacationChange={handleVacationChange}
-                onChantierChange={handleChantierChange}
-                onMonthlyCustomExpenseAdd={handleMonthlyCustomExpenseAdd}
-                onMonthlyCustomExpenseRemove={handleMonthlyCustomExpenseRemove}
-                vacationExpenses={vacationExpenses}
-                chantierExpenses={chantierExpenses}
-                monthlyCustomExpenses={monthlyCustomExpenses}
-              />
-            )}
-          </TabsContent>          <TabsContent value="statistics" className="space-y-6">
-            <Statistics data={monthlyData} alertThreshold={settings.alertThreshold} />
-            <ExpenseStats 
-              expenseSettings={settings.expenseSettings}
-              currentDate={new Date()}
+        {/* Solde actuel - Version mobile optimisée */}
+        <div className={cn(
+          "mb-6 mx-auto",
+          isMobile ? "max-w-full" : "max-w-md"
+        )}>
+          {isMobile ? (
+            <MobileNumberInput
+              value={settings.currentBalance}
+              onChange={handleCurrentBalanceChange}
+              label="Solde actuel"
+              quickButtons={[100, 500, 1000]}
+              currency="TND"
+              className="w-full"
             />
-          </TabsContent><TabsContent value="settings" className="space-y-6">
-            <div className="max-w-4xl mx-auto space-y-6">
-              <AdvancedSettings 
-                settings={settings} 
-                onSettingsChange={handleSettingsChange} 
-              />
-                <FixedAmountsManager 
-                fixedAmounts={settings.fixedAmounts}
-                onFixedAmountsChange={(fixedAmounts) => setSettings(prev => ({ ...prev, fixedAmounts }))}
-              />
-              
-              <ExpenseCategoriesManager 
-                expenseSettings={settings.expenseSettings}
-                onExpenseSettingsChange={handleExpenseSettingsChange}
-                currentDate={new Date()}
-              />
-              
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <CustomRevenueManager 
-                  revenues={settings.customRevenues}
-                  onRevenuesChange={(revenues) => setSettings(prev => ({ ...prev, customRevenues: revenues }))}
-                />
-                
-                <CustomExpensesManager 
-                  expenses={settings.customRecurringExpenses}
-                  onExpensesChange={(expenses) => setSettings(prev => ({ ...prev, customRecurringExpenses: expenses }))}
-                />
-              </div>
-              
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <CustomExpensesManager 
-                  expenses={customExpenses}
-                  onExpensesChange={setCustomExpenses}
-                />
-                
-                <VacationManager 
-                  vacationExpenses={vacationExpenses}
-                  onVacationChange={setVacationExpenses}
-                />
-              </div>
-                <ChantierManager 
-                chantierExpenses={chantierExpenses}
-                onChantierChange={setChantierExpenses}
-              />
-                <DataManagement
-                settings={settings}
-                customExpenses={customExpenses}
-                vacationExpenses={vacationExpenses}
-                chantierExpenses={chantierExpenses}
-                onDataImport={handleDataImport}
-                onReset={handleReset}
+          ) : (
+            <div className="space-y-2">
+              <label htmlFor="currentBalance" className="text-sm font-medium">
+                Solde actuel (TND)
+              </label>
+              <p className="text-xs text-muted-foreground mb-2">
+                💡 Les salaires et bonus sont versés en fin de mois et disponibles le mois suivant
+              </p>
+              <input
+                id="currentBalance"
+                type="number"
+                value={settings.currentBalance}
+                onChange={(e) => handleCurrentBalanceChange(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
-          </TabsContent>
-        </Tabs>
+          )}
+        </div>
+
+        {/* Navigation adaptative */}
+        {isMobile ? (
+          <MobileOptimizedTabs defaultValue="forecast" className="space-y-6">
+            <TabsContent value="forecast" className={cn("space-y-4", isMobile && "px-2")}>
+              <FinancialSummary data={monthlyData} alertThreshold={settings.alertThreshold} />
+              <CashFlowChart data={monthlyData} alertThreshold={settings.alertThreshold} />
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Détail mensuel</h3>
+                <MonthlyForecast 
+                  data={monthlyData} 
+                  alertThreshold={settings.alertThreshold}
+                  monthsToDisplay={settings.monthsToDisplay}
+                  currentBalance={settings.currentBalance}
+                  onCurrentBalanceChange={handleCurrentBalanceChange}
+                  onCurrentMonthExpenseForecastChange={handleCurrentMonthExpenseForecastChange}
+                  currentMonthExpenseForecast={currentMonthExpenseForecast}
+                  onVacationChange={handleVacationChange}
+                  onChantierChange={handleChantierChange}
+                  onMonthlyCustomExpenseAdd={handleMonthlyCustomExpenseAdd}
+                  onMonthlyCustomExpenseRemove={handleMonthlyCustomExpenseRemove}
+                  vacationExpenses={vacationExpenses}
+                  chantierExpenses={chantierExpenses}
+                  monthlyCustomExpenses={monthlyCustomExpenses}
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="statistics" className={cn("space-y-4", isMobile && "px-2")}>
+              <Statistics data={monthlyData} alertThreshold={settings.alertThreshold} />
+              <ExpenseStats 
+                expenseSettings={settings.expenseSettings}
+                currentDate={new Date()}
+              />
+            </TabsContent>
+
+            <TabsContent value="settings" className={cn("space-y-4", isMobile && "px-2")}>
+              <div className="space-y-6">
+                <AdvancedSettings 
+                  settings={settings} 
+                  onSettingsChange={handleSettingsChange} 
+                />
+                
+                <FixedAmountsManager 
+                  fixedAmounts={settings.fixedAmounts}
+                  onFixedAmountsChange={(fixedAmounts) => setSettings(prev => ({ ...prev, fixedAmounts }))}
+                />
+                
+                <ExpenseCategoriesManager 
+                  expenseSettings={settings.expenseSettings}
+                  onExpenseSettingsChange={handleExpenseSettingsChange}
+                  currentDate={new Date()}
+                />
+                  <div className="space-y-6">
+                  <CustomRevenueManager 
+                    revenues={settings.customRevenues}
+                    onRevenuesChange={(revenues) => setSettings(prev => ({ ...prev, customRevenues: revenues }))}
+                  />
+                  
+                  <CustomExpensesManager 
+                    expenses={settings.customRecurringExpenses}
+                    onExpensesChange={(expenses) => setSettings(prev => ({ ...prev, customRecurringExpenses: expenses }))}
+                  />
+                  
+                  <CustomExpensesManager 
+                    expenses={customExpenses}
+                    onExpensesChange={setCustomExpenses}
+                  />
+                  
+                  <VacationManager 
+                    vacationExpenses={vacationExpenses}
+                    onVacationChange={setVacationExpenses}
+                  />
+                  
+                  <ChantierManager 
+                    chantierExpenses={chantierExpenses}
+                    onChantierChange={setChantierExpenses}
+                  />
+                  
+                  <DataManagement
+                    settings={settings}
+                    customExpenses={customExpenses}
+                    vacationExpenses={vacationExpenses}
+                    chantierExpenses={chantierExpenses}
+                    onDataImport={handleDataImport}
+                    onReset={handleReset}
+                  />
+                </div>
+              </div>
+            </TabsContent>
+          </MobileOptimizedTabs>
+        ) : (
+          <Tabs defaultValue="forecast" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="forecast" className="flex items-center gap-2">
+                <Calculator className="h-4 w-4" />
+                Prévisions
+              </TabsTrigger>
+              <TabsTrigger value="statistics" className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                Statistiques
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="flex items-center gap-2">
+                <SettingsIcon className="h-4 w-4" />
+                Paramètres
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="forecast" className="space-y-6">
+              <FinancialSummary data={monthlyData} alertThreshold={settings.alertThreshold} />
+              <CashFlowChart data={monthlyData} alertThreshold={settings.alertThreshold} />
+              
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Détail mensuel</h3>
+                <div className="flex space-x-2">
+                  <Button
+                    variant={viewMode === 'compact' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewMode('compact')}
+                  >
+                    <LayoutGrid className="w-4 h-4 mr-2" />
+                    Compact
+                  </Button>
+                  <Button
+                    variant={viewMode === 'detailed' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewMode('detailed')}
+                  >
+                    <List className="w-4 h-4 mr-2" />
+                    Détaillé
+                  </Button>
+                </div>
+              </div>
+
+              {viewMode === 'compact' ? (
+                <CompactView 
+                  data={monthlyData}
+                  alertThreshold={settings.alertThreshold}
+                  onMonthClick={(index) => {
+                    setSelectedMonthIndex(index);
+                    setViewMode('detailed');
+                  }}
+                  vacationExpenses={vacationExpenses}
+                  chantierExpenses={chantierExpenses}
+                />
+              ) : (
+                <MonthlyForecast 
+                  data={monthlyData} 
+                  alertThreshold={settings.alertThreshold}
+                  monthsToDisplay={settings.monthsToDisplay}
+                  currentBalance={settings.currentBalance}
+                  onCurrentBalanceChange={handleCurrentBalanceChange}
+                  onCurrentMonthExpenseForecastChange={handleCurrentMonthExpenseForecastChange}
+                  currentMonthExpenseForecast={currentMonthExpenseForecast}
+                  onVacationChange={handleVacationChange}
+                  onChantierChange={handleChantierChange}
+                  onMonthlyCustomExpenseAdd={handleMonthlyCustomExpenseAdd}
+                  onMonthlyCustomExpenseRemove={handleMonthlyCustomExpenseRemove}
+                  vacationExpenses={vacationExpenses}
+                  chantierExpenses={chantierExpenses}
+                  monthlyCustomExpenses={monthlyCustomExpenses}
+                />
+              )}
+            </TabsContent>
+
+            <TabsContent value="statistics" className="space-y-6">
+              <Statistics data={monthlyData} alertThreshold={settings.alertThreshold} />
+              <ExpenseStats 
+                expenseSettings={settings.expenseSettings}
+                currentDate={new Date()}
+              />
+            </TabsContent>
+
+            <TabsContent value="settings" className="space-y-6">
+              <div className="max-w-4xl mx-auto space-y-6">
+                <AdvancedSettings 
+                  settings={settings} 
+                  onSettingsChange={handleSettingsChange} 
+                />
+                
+                <FixedAmountsManager 
+                  fixedAmounts={settings.fixedAmounts}
+                  onFixedAmountsChange={(fixedAmounts) => setSettings(prev => ({ ...prev, fixedAmounts }))}
+                />
+                
+                <ExpenseCategoriesManager 
+                  expenseSettings={settings.expenseSettings}
+                  onExpenseSettingsChange={handleExpenseSettingsChange}
+                  currentDate={new Date()}
+                />
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <CustomRevenueManager 
+                    revenues={settings.customRevenues}
+                    onRevenuesChange={(revenues) => setSettings(prev => ({ ...prev, customRevenues: revenues }))}
+                  />
+                  
+                  <CustomExpensesManager 
+                    expenses={settings.customRecurringExpenses}
+                    onExpensesChange={(expenses) => setSettings(prev => ({ ...prev, customRecurringExpenses: expenses }))}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <CustomExpensesManager 
+                    expenses={customExpenses}
+                    onExpensesChange={setCustomExpenses}
+                  />
+                  
+                  <VacationManager 
+                    vacationExpenses={vacationExpenses}
+                    onVacationChange={setVacationExpenses}
+                  />
+                </div>
+                
+                <ChantierManager 
+                  chantierExpenses={chantierExpenses}
+                  onChantierChange={setChantierExpenses}
+                />
+                
+                <DataManagement
+                  settings={settings}
+                  customExpenses={customExpenses}
+                  vacationExpenses={vacationExpenses}
+                  chantierExpenses={chantierExpenses}
+                  onDataImport={handleDataImport}
+                  onReset={handleReset}
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
+        )}
       </div>
     </div>
   );
