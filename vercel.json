@@ -14,7 +14,7 @@
       "source": "/debug",
       "destination": "/index.html"
     },    {
-      "source": "/((?!emergency\\.html|versions\\.html|simple\\.html).*)",
+      "source": "/((?!emergency\\.html|versions\\.html|simple\\.html|responsive-test\\.html|blank-page-diagnostic\\.html).*)",
       "destination": "/index.html"
     }
   ],
@@ -32,7 +32,7 @@
         }
       ]
     },    {
-      "source": "/(emergency|versions|simple)\\.html",
+      "source": "/(emergency|versions|simple|responsive-test|blank-page-diagnostic)\\.html",
       "headers": [
         {
           "key": "Cache-Control",

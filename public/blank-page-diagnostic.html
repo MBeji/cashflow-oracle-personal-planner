@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    
+    <title>🚨 Diagnostic Page Blanche iPhone</title>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        
+        .diagnostic-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .status-ok { background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin: 5px 0; }
+        .status-error { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin: 5px 0; }
+        .status-warning { background: #fff3cd; color: #856404; padding: 10px; border-radius: 4px; margin: 5px 0; }
+        
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 24px;
+            font-size: 16px;
+            min-height: 44px;
+            cursor: pointer;
+            margin: 10px 5px;
+            width: 100%;
+            touch-action: manipulation;
+        }
+        
+        .test-button:active {
+            background: #0056b3;
+        }
+        
+        #live-log {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+        
+        .critical-info {
+            background: #ffe6e6;
+            border: 2px solid #ff9999;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚨 Diagnostic Page Blanche iPhone</h1>
+    <p>Cette page identifie pourquoi l'application principale affiche une page blanche sur iPhone.</p>
+    
+    <div class="critical-info">
+        <strong>⚠️ PROBLÈME IDENTIFIÉ :</strong> Page blanche sur iPhone dans l'app principale.
+        <br><strong>✅ ÉTAT ACTUEL :</strong> Les pages HTML statiques fonctionnent.
+        <br><strong>🎯 OBJECTIF :</strong> Identifier la cause exacte du problème React.
+    </div>
+    
+    <div class="diagnostic-card">
+        <h2>🔍 Tests Immédiats</h2>
+        <div id="immediate-tests">
+            <div class="status-warning">Tests en cours...</div>
+        </div>
+    </div>
+    
+    <div class="diagnostic-card">
+        <h2>🧪 Test JavaScript Basique</h2>
+        <button class="test-button" onclick="testBasicJS()">Test JavaScript</button>
+        <div id="js-test-result" class="status-warning">Cliquez pour tester</div>
+    </div>
+    
+    <div class="diagnostic-card">
+        <h2>📦 Test Imports ES6</h2>
+        <button class="test-button" onclick="testES6Imports()">Test ES6 Imports</button>
+        <div id="es6-test-result" class="status-warning">Cliquez pour tester</div>
+    </div>
+    
+    <div class="diagnostic-card">
+        <h2>⚛️ Test React de Base</h2>
+        <button class="test-button" onclick="testReactBasic()">Test React</button>
+        <div id="react-test-result" class="status-warning">Cliquez pour tester</div>
+    </div>
+    
+    <div class="diagnostic-card">
+        <h2>🌐 Test Fetch API</h2>
+        <button class="test-button" onclick="testFetchAPI()">Test Network</button>
+        <div id="fetch-test-result" class="status-warning">Cliquez pour tester</div>
+    </div>
+    
+    <div class="diagnostic-card">
+        <h2>📱 Test Specific iPhone/Chrome</h2>
+        <button class="test-button" onclick="testChromeIOS()">Test Chrome iPhone</button>
+        <div id="chrome-test-result" class="status-warning">Cliquez pour tester</div>
+    </div>
+    
+    <div class="diagnostic-card">
+        <h2>🔥 Log en Temps Réel</h2>
+        <div id="live-log">Logs de diagnostic en temps réel...</div>
+        <button class="test-button" onclick="clearLog()">Effacer les Logs</button>
+    </div>
+    
+    <div class="diagnostic-card">
+        <h2>🔗 Navigation de Secours</h2>
+        <button class="test-button" onclick="window.location.href='/versions.html'">📋 Retour aux Versions</button>
+        <button class="test-button" onclick="window.location.href='/emergency.html'">🚨 Page d'Urgence</button>
+        <button class="test-button" onclick="window.location.href='/'">⚠️ Tenter App Principale</button>
+    </div>
+    
+    <script>
+        // Système de log global
+        const logDiv = document.getElementById('live-log');
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        const originalConsoleWarn = console.warn;
+        
+        function logToDiv(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#ff6b6b' : type === 'warn' ? '#ffd93d' : '#00ff00';
+            logDiv.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        // Override console pour capturer tous les logs
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            logToDiv(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalConsoleError.apply(console, args);
+            logToDiv('ERROR: ' + args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalConsoleWarn.apply(console, args);
+            logToDiv('WARN: ' + args.join(' '), 'warn');
+        };
+        
+        // Capturer les erreurs globales
+        window.addEventListener('error', function(e) {
+            logToDiv(`GLOBAL ERROR: ${e.message} at ${e.filename}:${e.lineno}`, 'error');
+        });
+        
+        window.addEventListener('unhandledrejection', function(e) {
+            logToDiv(`UNHANDLED PROMISE: ${e.reason}`, 'error');
+        });
+        
+        function clearLog() {
+            logDiv.innerHTML = 'Logs effacés...<br>';
+        }
+        
+        function updateTestResult(id, success, message) {
+            const div = document.getElementById(id);
+            div.className = success ? 'status-ok' : 'status-error';
+            div.textContent = (success ? '✅ ' : '❌ ') + message;
+        }
+        
+        function testBasicJS() {
+            console.log('🧪 Test JavaScript basique...');
+            
+            try {
+                // Test 1: Variables et fonctions
+                const test = 'Hello World';
+                const array = [1, 2, 3];
+                const object = { key: 'value' };
+                
+                // Test 2: ES6 features
+                const arrow = () => 'Arrow function works';
+                const destructured = { ...object, new: 'property' };
+                
+                // Test 3: Promises
+                new Promise(resolve => resolve('Promise works')).then(result => {
+                    console.log('Promise result:', result);
+                });
+                
+                updateTestResult('js-test-result', true, 'JavaScript de base fonctionne');
+                console.log('✅ JavaScript de base: OK');
+                
+            } catch (error) {
+                updateTestResult('js-test-result', false, `Erreur JS: ${error.message}`);
+                console.error('❌ JavaScript de base:', error);
+            }
+        }
+        
+        async function testES6Imports() {
+            console.log('🧪 Test ES6 Imports...');
+            
+            try {
+                // Test import dynamique basic
+                const testModule = await import('data:text/javascript,export default function() { return "ES6 Import works"; }');
+                const result = testModule.default();
+                
+                updateTestResult('es6-test-result', true, 'ES6 Imports fonctionnent');
+                console.log('✅ ES6 Imports: OK -', result);
+                
+            } catch (error) {
+                updateTestResult('es6-test-result', false, `Erreur ES6: ${error.message}`);
+                console.error('❌ ES6 Imports:', error);
+            }
+        }
+        
+        async function testReactBasic() {
+            console.log('🧪 Test React de base...');
+            
+            try {
+                // Test si React peut être importé
+                const reactCDN = 'https://unpkg.com/react@18/umd/react.development.js';
+                
+                const script = document.createElement('script');
+                script.src = reactCDN;
+                script.onload = () => {
+                    if (typeof React !== 'undefined') {
+                        updateTestResult('react-test-result', true, 'React peut être chargé');
+                        console.log('✅ React: Peut être chargé');
+                    } else {
+                        updateTestResult('react-test-result', false, 'React non accessible après chargement');
+                        console.error('❌ React: Non accessible');
+                    }
+                };
+                script.onerror = () => {
+                    updateTestResult('react-test-result', false, 'Erreur de chargement React');
+                    console.error('❌ React: Erreur de chargement');
+                };
+                
+                document.head.appendChild(script);
+                
+            } catch (error) {
+                updateTestResult('react-test-result', false, `Erreur React: ${error.message}`);
+                console.error('❌ React:', error);
+            }
+        }
+        
+        async function testFetchAPI() {
+            console.log('🧪 Test Fetch API...');
+            
+            try {
+                // Test simple de fetch vers une URL accessible
+                const response = await fetch('/versions.html');
+                
+                if (response.ok) {
+                    updateTestResult('fetch-test-result', true, 'Fetch API fonctionne');
+                    console.log('✅ Fetch API: OK');
+                } else {
+                    updateTestResult('fetch-test-result', false, `Fetch erreur: ${response.status}`);
+                    console.error('❌ Fetch API: Status', response.status);
+                }
+                
+            } catch (error) {
+                updateTestResult('fetch-test-result', false, `Erreur Fetch: ${error.message}`);
+                console.error('❌ Fetch API:', error);
+            }
+        }
+        
+        function testChromeIOS() {
+            console.log('🧪 Test Chrome iPhone spécifique...');
+            
+            try {
+                const userAgent = navigator.userAgent;
+                const isChromeIOS = /CriOS/.test(userAgent);
+                const isIOS = /iPhone|iPad|iPod/.test(userAgent);
+                
+                console.log('User Agent:', userAgent);
+                console.log('Chrome iOS:', isChromeIOS);
+                console.log('iOS Device:', isIOS);
+                
+                // Test des APIs spécifiques
+                const tests = {
+                    'Touch Events': 'ontouchstart' in window,
+                    'CSS Grid': CSS.supports('display', 'grid'),
+                    'CSS Flexbox': CSS.supports('display', 'flex'),
+                    'ES6 Modules': typeof Symbol !== 'undefined',
+                    'Local Storage': typeof localStorage !== 'undefined',
+                    'Session Storage': typeof sessionStorage !== 'undefined',
+                    'History API': typeof history.pushState !== 'undefined',
+                    'Fetch API': typeof fetch !== 'undefined'
+                };
+                
+                let success = true;
+                let details = [];
+                
+                for (const [test, result] of Object.entries(tests)) {
+                    const status = result ? '✅' : '❌';
+                    details.push(`${status} ${test}: ${result}`);
+                    console.log(`${status} ${test}:`, result);
+                    if (!result) success = false;
+                }
+                
+                const message = `Chrome iOS: ${isChromeIOS ? 'Détecté' : 'Non détecté'}. Tests: ${Object.values(tests).filter(Boolean).length}/${Object.keys(tests).length}`;
+                updateTestResult('chrome-test-result', success, message);
+                
+                console.log('🔍 Détails des tests:', details);
+                
+            } catch (error) {
+                updateTestResult('chrome-test-result', false, `Erreur Chrome iOS: ${error.message}`);
+                console.error('❌ Chrome iOS Test:', error);
+            }
+        }
+        
+        // Tests automatiques au chargement
+        function runImmediateTests() {
+            console.log('🚀 Démarrage des tests automatiques...');
+            
+            const testsDiv = document.getElementById('immediate-tests');
+            const tests = [];
+            
+            // Test 1: JavaScript de base
+            try {
+                const testVar = 'OK';
+                tests.push('✅ Variables JavaScript: OK');
+            } catch (e) {
+                tests.push('❌ Variables JavaScript: ERREUR');
+            }
+            
+            // Test 2: DOM Ready
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                tests.push('✅ DOM Ready: OK');
+            } else {
+                tests.push('❌ DOM Ready: Pas prêt');
+            }
+            
+            // Test 3: Console
+            if (typeof console !== 'undefined') {
+                tests.push('✅ Console: OK');
+            } else {
+                tests.push('❌ Console: Indisponible');
+            }
+            
+            // Test 4: Viewport
+            const viewport = window.innerWidth && window.innerHeight;
+            if (viewport) {
+                tests.push(`✅ Viewport: ${window.innerWidth}x${window.innerHeight}`);
+            } else {
+                tests.push('❌ Viewport: Indisponible');
+            }
+            
+            testsDiv.innerHTML = tests.map(test => 
+                `<div class="${test.includes('✅') ? 'status-ok' : 'status-error'}">${test}</div>`
+            ).join('');
+            
+            console.log('📊 Tests immédiats terminés:', tests.length, 'tests');
+        }
+        
+        // Lancement automatique
+        document.addEventListener('DOMContentLoaded', runImmediateTests);
+        
+        // Si DOM déjà prêt
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            runImmediateTests();
+        }
+        
+        console.log('🚨 Page Blanche Diagnostic chargée');
+        console.log('📱 Device Info:', {
+            userAgent: navigator.userAgent,
+            viewport: `${window.innerWidth}x${window.innerHeight}`,
+            screen: `${screen.width}x${screen.height}`,
+            pixelRatio: window.devicePixelRatio
+        });
+    </script>
+</body>
+</html>

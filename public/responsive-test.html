@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    
+    <title>🔍 Diagnostic CSS Responsive</title>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 16px; /* Important pour éviter le zoom iOS */
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .test-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .responsive-grid {
+            display: grid;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 24px;
+            font-size: 16px;
+            min-height: 44px; /* Taille tactile iOS */
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: background-color 0.2s ease;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .test-button:hover {
+            background: #0056b3;
+        }
+        
+        .test-button:active {
+            transform: scale(0.98);
+        }
+        
+        .test-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px; /* Important pour éviter le zoom iOS */
+            margin: 10px 0;
+            min-height: 44px;
+        }
+        
+        .status-indicator {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .status-ok {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* Tests de breakpoints */
+        .breakpoint-indicator {
+            font-weight: bold;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        /* Mobile First - Défaut */
+        .breakpoint-indicator {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .breakpoint-indicator::before {
+            content: "📱 Mobile (Default) - ";
+        }
+        
+        /* Tablet */
+        @media screen and (min-width: 640px) {
+            .responsive-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .breakpoint-indicator {
+                background: #f3e5f5;
+                color: #7b1fa2;
+            }
+            
+            .breakpoint-indicator::before {
+                content: "📺 Tablet (≥640px) - ";
+            }
+        }
+        
+        /* Desktop */
+        @media screen and (min-width: 1024px) {
+            .responsive-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+            
+            .breakpoint-indicator {
+                background: #e8f5e8;
+                color: #2e7d32;
+            }
+            
+            .breakpoint-indicator::before {
+                content: "💻 Desktop (≥1024px) - ";
+            }
+        }
+        
+        /* Tests spécifiques iPhone */
+        @media screen and (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .test-card {
+                padding: 15px;
+                margin: 10px 0;
+            }
+            
+            .test-button {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+        
+        /* Tests orientation iPhone */
+        @media screen and (max-width: 926px) and (orientation: landscape) {
+            .container {
+                padding: 10px 20px;
+            }
+            
+            .test-card {
+                padding: 10px;
+            }
+        }
+        
+        /* Tests spécifiques iOS Safari */
+        @media screen and (max-device-width: 768px) {
+            body {
+                -webkit-overflow-scrolling: touch;
+                overflow-scrolling: touch;
+            }
+            
+            .test-input {
+                -webkit-appearance: none;
+                appearance: none;
+                -webkit-border-radius: 0;
+                border-radius: 6px;
+            }
+        }
+        
+        /* Tests Chrome iPhone */
+        @supports (-webkit-touch-callout: none) {
+            .test-button {
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                user-select: none;
+            }
+        }
+        
+        /* Fixes pour page blanche */
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+        
+        #root {
+            min-height: 100vh;
+        }
+        
+        /* Tests de détection de problèmes courants */
+        .overflow-test {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            background: #f0f0f0;
+            padding: 10px;
+            white-space: nowrap;
+        }
+        
+        .flex-test {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .flex-item {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        @media screen and (max-width: 640px) {
+            .flex-item {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Diagnostic CSS Responsive</h1>
+        <p>Cette page teste la responsivité et identifie les problèmes potentiels sur iPhone.</p>
+        
+        <div class="breakpoint-indicator">
+            Breakpoint actuel détecté
+        </div>
+        
+        <div class="test-card">
+            <h2>📱 Informations Device</h2>
+            <div class="status-indicator status-ok" id="device-info">
+                Chargement...
+            </div>
+            
+            <div class="status-indicator status-warning" id="viewport-info">
+                Viewport: Chargement...
+            </div>
+            
+            <div class="status-indicator" id="responsive-status">
+                Test responsive: En cours...
+            </div>
+        </div>
+        
+        <div class="test-card">
+            <h2>🧪 Tests Responsive</h2>
+            
+            <h3>Test Grid Responsive:</h3>
+            <div class="responsive-grid">
+                <div class="test-card">Colonne 1</div>
+                <div class="test-card">Colonne 2</div>
+                <div class="test-card">Colonne 3</div>
+            </div>
+            
+            <h3>Test Flexbox Responsive:</h3>
+            <div class="flex-test">
+                <div class="flex-item">Item 1</div>
+                <div class="flex-item">Item 2</div>
+                <div class="flex-item">Item 3</div>
+            </div>
+        </div>
+        
+        <div class="test-card">
+            <h2>🎯 Tests Interactions Tactiles</h2>
+            
+            <button class="test-button" onclick="testTouch('button')">
+                Test Bouton Tactile
+            </button>
+            
+            <input type="text" class="test-input" placeholder="Test Input (pas de zoom sur focus)" 
+                   onfocus="testTouch('input')" />
+            
+            <input type="number" class="test-input" placeholder="Test Input Number" 
+                   onfocus="testTouch('number')" />
+            
+            <div id="touch-results" class="status-indicator status-warning">
+                Touchez les éléments ci-dessus pour tester
+            </div>
+        </div>
+        
+        <div class="test-card">
+            <h2>📏 Test Overflow</h2>
+            <div class="overflow-test">
+                Texte très long qui ne doit pas causer de défilement horizontal indésiré sur mobile. Lorem ipsum dolor sit amet consectetur adipisicing elit. Qui, tempore!
+            </div>
+        </div>
+        
+        <div class="test-card">
+            <h2>🚨 Diagnostics Problèmes Courants</h2>
+            <div id="diagnostics">
+                <div class="status-indicator status-warning">
+                    Diagnostics en cours...
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-card">
+            <h2>🔗 Navigation</h2>
+            <button class="test-button" onclick="window.location.href='/versions.html'">
+                📋 Page des Versions
+            </button>
+            <button class="test-button" onclick="window.location.href='/emergency.html'">
+                🚨 Page d'Urgence
+            </button>
+            <button class="test-button" onclick="window.location.href='/'">
+                🏠 App Principale
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        function testTouch(type) {
+            const resultsDiv = document.getElementById('touch-results');
+            resultsDiv.textContent = `✅ ${type} fonctionne! Timestamp: ${new Date().toLocaleTimeString()}`;
+            resultsDiv.className = 'status-indicator status-ok';
+        }
+        
+        function updateDeviceInfo() {
+            // Device info
+            const deviceInfo = document.getElementById('device-info');
+            const userAgent = navigator.userAgent;
+            let deviceType = 'Inconnu';
+            
+            if (/iPhone|iPad|iPod/.test(userAgent)) {
+                if (/CriOS/.test(userAgent)) {
+                    deviceType = '📱 iPhone - Chrome';
+                } else if (/Safari/.test(userAgent)) {
+                    deviceType = '📱 iPhone - Safari';
+                }
+            } else if (/Android/.test(userAgent)) {
+                deviceType = '🤖 Android';
+            } else {
+                deviceType = '💻 Desktop';
+            }
+            
+            deviceInfo.textContent = deviceType;
+            
+            // Viewport info
+            const viewportInfo = document.getElementById('viewport-info');
+            const viewport = `${window.innerWidth} x ${window.innerHeight}`;
+            const screen = `${screen.width} x ${screen.height}`;
+            viewportInfo.textContent = `Viewport: ${viewport} | Screen: ${screen}`;
+            
+            // Responsive status
+            const responsiveStatus = document.getElementById('responsive-status');
+            const width = window.innerWidth;
+            
+            if (width < 640) {
+                responsiveStatus.textContent = '📱 Mode Mobile Actif';
+                responsiveStatus.className = 'status-indicator status-ok';
+            } else if (width < 1024) {
+                responsiveStatus.textContent = '📺 Mode Tablet Actif';
+                responsiveStatus.className = 'status-indicator status-warning';
+            } else {
+                responsiveStatus.textContent = '💻 Mode Desktop Actif';
+                responsiveStatus.className = 'status-indicator status-ok';
+            }
+        }
+        
+        function runDiagnostics() {
+            const diagnosticsDiv = document.getElementById('diagnostics');
+            const issues = [];
+            
+            // Test 1: Overflow horizontal
+            if (document.body.scrollWidth > window.innerWidth) {
+                issues.push('❌ Défilement horizontal détecté');
+            }
+            
+            // Test 2: Viewport
+            const viewportMeta = document.querySelector('meta[name="viewport"]');
+            if (!viewportMeta || !viewportMeta.content.includes('width=device-width')) {
+                issues.push('❌ Meta viewport incorrect');
+            }
+            
+            // Test 3: Font size
+            const bodyFontSize = window.getComputedStyle(document.body).fontSize;
+            if (parseInt(bodyFontSize) < 16) {
+                issues.push('⚠️ Font-size < 16px (peut causer du zoom iOS)');
+            }
+            
+            // Test 4: Touch targets
+            const buttons = document.querySelectorAll('.test-button');
+            buttons.forEach((button, index) => {
+                const rect = button.getBoundingClientRect();
+                if (rect.height < 44) {
+                    issues.push(`⚠️ Bouton ${index + 1} trop petit pour touch (${rect.height}px < 44px)`);
+                }
+            });
+            
+            // Test 5: CSS Support
+            if (!CSS.supports('display', 'grid')) {
+                issues.push('❌ CSS Grid non supporté');
+            }
+            
+            if (!CSS.supports('display', 'flex')) {
+                issues.push('❌ CSS Flexbox non supporté');
+            }
+            
+            // Affichage des résultats
+            if (issues.length === 0) {
+                diagnosticsDiv.innerHTML = '<div class="status-indicator status-ok">✅ Tous les tests passent!</div>';
+            } else {
+                diagnosticsDiv.innerHTML = issues.map(issue => 
+                    `<div class="status-indicator ${issue.includes('❌') ? 'status-error' : 'status-warning'}">${issue}</div>`
+                ).join('');
+            }
+        }
+        
+        // Tests au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDeviceInfo();
+            runDiagnostics();
+            
+            // Re-test au redimensionnement
+            window.addEventListener('resize', updateDeviceInfo);
+        });
+        
+        console.log('🔍 CSS Responsive Diagnostic loaded');
+        console.log('📱 User Agent:', navigator.userAgent);
+        console.log('📏 Viewport:', window.innerWidth, 'x', window.innerHeight);
+        console.log('🖥️ Screen:', screen.width, 'x', screen.height);
+    </script>
+</body>
+</html>
