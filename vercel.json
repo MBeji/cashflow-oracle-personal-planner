@@ -13,9 +13,8 @@
     {
       "source": "/debug",
       "destination": "/index.html"
-    },
-    {
-      "source": "/((?!emergency\\.html|versions\\.html).*)",
+    },    {
+      "source": "/((?!emergency\\.html|versions\\.html|simple\\.html).*)",
       "destination": "/index.html"
     }
   ],
@@ -32,9 +31,8 @@
           "value": "nosniff"
         }
       ]
-    },
-    {
-      "source": "/(emergency|versions)\\.html",
+    },    {
+      "source": "/(emergency|versions|simple)\\.html",
       "headers": [
         {
           "key": "Cache-Control",
