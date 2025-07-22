@@ -112,11 +112,11 @@ function fixChromeIOSRendering() {
   (document.body.style as any).webkitTransform = 'translateZ(0)';
 }
 
-// Gestionnaire des événements touch pour Chrome iOS
+// Gestionnaire des événements touch pour Chrome iOS - Amélioré
 function handleChromeIOSTouchEvents() {
   if (!isChromeIOS()) return;
   
-  // Prévenir le double-tap zoom
+  // Fix 1: Prévenir le double-tap zoom
   let lastTouchEnd = 0;
   document.addEventListener('touchend', function (event) {
     const now = (new Date()).getTime();
@@ -126,10 +126,54 @@ function handleChromeIOSTouchEvents() {
     lastTouchEnd = now;
   }, { passive: false });
   
-  // Améliorer la réactivité des clics
-  document.addEventListener('touchstart', function() {
+  // Fix 2: Améliorer la réactivité des clics sur Chrome iPhone
+  document.addEventListener('touchstart', function(e) {
     // Chrome iOS touch feedback
+    const target = e.target as HTMLElement;
+    if (target && (target.tagName === 'BUTTON' || target.classList.contains('mobile-button'))) {
+      target.style.transform = 'scale(0.98)';
+      target.style.opacity = '0.8';
+    }
   }, { passive: true });
+  
+  document.addEventListener('touchend', function(e) {
+    const target = e.target as HTMLElement;
+    if (target && (target.tagName === 'BUTTON' || target.classList.contains('mobile-button'))) {
+      setTimeout(() => {
+        target.style.transform = '';
+        target.style.opacity = '';
+      }, 150);
+    }
+  }, { passive: true });
+  
+  // Fix 3: Force touch events pour les éléments interactifs
+  const interactiveElements = document.querySelectorAll('button, .mobile-button, .mobile-tab-trigger, [role="button"]');
+  interactiveElements.forEach(element => {
+    const el = element as HTMLElement;
+    el.style.touchAction = 'manipulation';
+    el.style.cursor = 'pointer';
+    
+    // Ajouter une classe pour identifier les éléments touchables
+    el.classList.add('mobile-touchable');
+    
+    // Force l'événement click sur touch
+    el.addEventListener('touchstart', function(e) {
+      this.classList.add('touching');
+    }, { passive: true });
+    
+    el.addEventListener('touchend', function(e) {
+      this.classList.remove('touching');
+      // Simuler un click si nécessaire
+      if (!e.defaultPrevented) {
+        this.click();
+      }
+    }, { passive: false });
+  });
+  
+  // Fix 4: Diagnostic touch events
+  console.log('🤚 Chrome iOS Touch Events configured');
+  console.log('Touch support:', 'ontouchstart' in window);
+  console.log('Pointer events:', 'onpointerdown' in window);
 }
 
 // Debugging pour Chrome iOS

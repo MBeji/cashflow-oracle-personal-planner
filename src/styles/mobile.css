@@ -325,3 +325,77 @@
     height: calc(var(--vh, 1vh) * 100);
   }
 }
+
+/* Corrections spécifiques Touch Events pour Chrome iPhone */
+@media screen and (max-width: 768px) {
+  /* Force touch events support sur Chrome iPhone */
+  * {
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Autoriser la sélection de texte dans les inputs */
+  input, textarea, select {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+    touch-action: manipulation;
+  }
+  
+  /* Chrome iPhone touch improvements */
+  button, .mobile-button, .mobile-tab-trigger, [role="button"] {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    /* Force l'événement touch sur Chrome iPhone */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  /* Améliorer la réactivité tactile */
+  button:active, 
+  .mobile-button:active, 
+  .mobile-tab-trigger:active,
+  [role="button"]:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+  
+  /* Fix pour les liens et éléments cliquables */
+  a, [onclick], [data-testid] {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+  }
+  
+  /* Chrome iPhone: Force les événements pointeur */
+  .mobile-touchable {
+    pointer-events: auto;
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  /* Éviter les conflits de touch events */
+  .mobile-no-touch {
+    pointer-events: none;
+    touch-action: none;
+  }
+}
+
+/* Fallback pour les anciens navigateurs Chrome iPhone */
+@supports not (touch-action: manipulation) {
+  @media screen and (max-width: 768px) {
+    button, .mobile-button, .mobile-tab-trigger {
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.2);
+      -webkit-touch-callout: default;
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import TouchEventsTester from './TouchEventsTester';
 
 interface DiagnosticInfo {
   userAgent: string;
@@ -185,9 +186,7 @@ const ChromeIOSDiagnostic: React.FC = () => {
             ))}
           </ul>
         </div>
-      )}
-
-      <div className="mt-6 bg-yellow-100 p-4 rounded">
+      )}      <div className="mt-6 bg-yellow-100 p-4 rounded">
         <h2 className="font-bold mb-2">Quick Fixes</h2>
         <p>If you're experiencing issues on Chrome iPhone:</p>
         <ul className="list-disc ml-4 mt-2">
@@ -197,6 +196,11 @@ const ChromeIOSDiagnostic: React.FC = () => {
           <li>Try in Safari for comparison</li>
           <li>Check network connection</li>
         </ul>
+      </div>
+
+      {/* Touch Events Tester */}
+      <div className="mt-6">
+        <TouchEventsTester />
       </div>
     </div>
   );
