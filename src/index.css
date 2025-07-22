@@ -109,3 +109,35 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Ajouts minimalistes pour compatibilité mobile sans casser l'existant */
+@media (max-width: 768px) {
+  /* Éviter le zoom automatique sur iOS */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+  
+  /* Assurer que les éléments ne débordent pas */
+  * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* Container responsive basique */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Cartes responsive basiques */
+  .grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+  
+  /* Boutons tactiles minimum 44px pour iOS */
+  button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
