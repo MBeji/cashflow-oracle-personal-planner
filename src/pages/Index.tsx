@@ -22,7 +22,7 @@ import { StorageService } from '@/utils/storage';
 import { useMobileDetection } from '@/hooks/useMobile';
 import { detectAndFixIOS } from '@/utils/iosFixes';
 import { CashFlowSettings as Settings, CustomExpense, FixedAmounts, MonthlyCustomExpense, ExpenseSettings } from '@/types/cashflow';
-import { Calculator, TrendingUp, Settings as SettingsIcon, LayoutGrid, List } from 'lucide-react';
+import { Calculator, TrendingUp, Settings as SettingsIcon, LayoutGrid, List, Bug } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const defaultExpenseSettings: ExpenseSettings = {
@@ -245,12 +245,23 @@ const Index = () => {
       <div className={cn(
         "container mx-auto max-w-7xl",
         isMobile ? "px-2 py-4" : "px-4 py-8"
-      )}>
-        {/* En-tête adaptatif */}
+      )}>        {/* En-tête adaptatif */}
         <div className={cn(
-          "mb-6 text-center",
+          "mb-6 text-center relative",
           isMobile && "mb-4"
         )}>
+          {/* Bouton debug - visible seulement sur mobile/iOS */}
+          {isMobile && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute top-0 right-0 opacity-60"
+              onClick={() => window.location.href = '/debug'}
+            >
+              <Bug className="h-4 w-4" />
+            </Button>
+          )}
+          
           <h1 className={cn(
             "font-bold text-foreground mb-2",
             isMobile ? "text-2xl" : "text-4xl"

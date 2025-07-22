@@ -76,15 +76,23 @@ function preventIOSHorizontalScroll() {
   document.body.style.overflowX = 'hidden';
 }
 
-// Détection iOS et application des corrections
+// Détection iOS et Chrome iOS étendue
 function detectAndFixIOS() {
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
                 (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  const isChromeIOS = /CriOS/.test(navigator.userAgent) || 
+                      (/Chrome/.test(navigator.userAgent) && isIOS);
   
-  if (isIOS || isSafari || window.innerWidth <= 768) {
-    console.log('🍎 iOS/Mobile detected - Applying mobile fixes');
+  const isMobile = window.innerWidth <= 768 || isIOS || isChromeIOS;
+  
+  if (isIOS || isSafari || isChromeIOS || isMobile) {
+    console.log('📱 Mobile/iOS detected - Applying mobile fixes');
+    console.log('- iOS:', isIOS);
+    console.log('- Safari:', isSafari);
+    console.log('- Chrome iOS:', isChromeIOS);
+    console.log('- Mobile:', isMobile);
     
     // Appliquer toutes les corrections
     fixIOSViewportHeight();
