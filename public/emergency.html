@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iPhone Debug Emergency</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+            padding: 20px; 
+            background: #f5f5f5;
+            margin: 0;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .button { 
+            background: #007AFF; 
+            color: white; 
+            border: none; 
+            padding: 15px 20px; 
+            margin: 10px 0; 
+            border-radius: 8px; 
+            width: 100%; 
+            font-size: 16px;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .button:active { 
+            background: #0056CC; 
+        }
+        .result { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 8px; 
+            border-left: 4px solid #007AFF;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .error { 
+            border-left-color: #FF3B30; 
+            background: #ffebee;
+        }
+        .success { 
+            border-left-color: #34C759; 
+            background: #e8f5e8;
+        }
+        h1 { 
+            color: #333; 
+            text-align: center; 
+        }
+        .status { 
+            text-align: center; 
+            margin: 20px 0; 
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚨 iPhone Debug Emergency</h1>
+        
+        <div class="status" id="status">Ready to diagnose...</div>
+        
+        <button class="button" onclick="runBasicTests()">🔍 Run Basic Tests</button>
+        <button class="button" onclick="testMainApp()">🚀 Test Main App</button>
+        <button class="button" onclick="testNetworkConnectivity()">🌐 Test Network</button>
+        <button class="button" onclick="clearData()">🗑️ Clear All Data</button>
+        
+        <div id="results"></div>
+        
+        <div class="result">
+            <strong>URLs à tester :</strong><br>
+            • App principale: <a href="http://10.241.200.126:8085/">http://10.241.200.126:8085/</a><br>
+            • Debug page: <a href="http://10.241.200.126:8085/debug">http://10.241.200.126:8085/debug</a><br>
+            • Cette page: http://10.241.200.126:8085/emergency.html
+        </div>
+    </div>
+
+    <script>
+        function addResult(content, type = 'result') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.textContent = content;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+        
+        function runBasicTests() {
+            updateStatus('Running basic tests...');
+            addResult('=== BASIC TESTS ===');
+            
+            // Browser info
+            const info = {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                cookieEnabled: navigator.cookieEnabled,
+                onLine: navigator.onLine,
+                maxTouchPoints: navigator.maxTouchPoints,
+                screenSize: `${screen.width}x${screen.height}`,
+                windowSize: `${window.innerWidth}x${window.innerHeight}`,
+                devicePixelRatio: window.devicePixelRatio,
+                
+                // Détections
+                isIOS: /iPad|iPhone|iPod/.test(navigator.userAgent),
+                isSafari: /^((?!chrome|android).)*safari/i.test(navigator.userAgent),
+                isChrome: /Chrome/.test(navigator.userAgent),
+                isChromeIOS: /CriOS/.test(navigator.userAgent),
+                
+                // Support
+                touchEvents: 'ontouchstart' in window,
+                localStorage: typeof(Storage) !== "undefined",
+                
+                // URL
+                currentURL: window.location.href,
+                protocol: window.location.protocol
+            };
+            
+            Object.entries(info).forEach(([key, value]) => {
+                addResult(`${key}: ${value}`, 'success');
+            });
+            
+            updateStatus('Basic tests completed');
+        }
+        
+        function testMainApp() {
+            updateStatus('Testing main app...');
+            addResult('=== MAIN APP TEST ===');
+            
+            const mainAppURL = 'http://10.241.200.126:8085/';
+            
+            fetch(mainAppURL)
+                .then(response => {
+                    addResult(`Main app status: ${response.status}`, response.ok ? 'success' : 'error');
+                    addResult(`Response headers: ${response.headers.get('content-type')}`, 'success');
+                    
+                    if (response.ok) {
+                        addResult('✅ Main app is accessible', 'success');
+                        addResult('Try opening: ' + mainAppURL, 'success');
+                    } else {
+                        addResult('❌ Main app returned error', 'error');
+                    }
+                    updateStatus('Main app test completed');
+                })
+                .catch(error => {
+                    addResult(`❌ Network error: ${error.message}`, 'error');
+                    addResult('Possible causes:', 'error');
+                    addResult('- Network connectivity issue', 'error');
+                    addResult('- Server not running on port 8085', 'error');
+                    addResult('- IP address changed', 'error');
+                    updateStatus('Main app test failed');
+                });
+        }
+        
+        function testNetworkConnectivity() {
+            updateStatus('Testing network...');
+            addResult('=== NETWORK TEST ===');
+            
+            // Test de connectivité basic
+            addResult(`Navigator online: ${navigator.onLine}`, navigator.onLine ? 'success' : 'error');
+            
+            // Test ping vers le serveur
+            const serverIP = '10.241.200.126';
+            const testURL = `http://${serverIP}:8085/`;
+            
+            const startTime = Date.now();
+            
+            fetch(testURL, { 
+                method: 'HEAD',
+                mode: 'no-cors',
+                cache: 'no-cache'
+            })
+            .then(() => {
+                const pingTime = Date.now() - startTime;
+                addResult(`✅ Server reachable in ${pingTime}ms`, 'success');
+                updateStatus('Network test passed');
+            })
+            .catch(error => {
+                addResult(`❌ Server unreachable: ${error.message}`, 'error');
+                addResult('Check if:', 'error');
+                addResult('- WiFi is connected', 'error');
+                addResult('- Same network as computer', 'error');
+                addResult('- Server is running', 'error');
+                updateStatus('Network test failed');
+            });
+        }
+        
+        function clearData() {
+            updateStatus('Clearing data...');
+            
+            try {
+                localStorage.clear();
+                sessionStorage.clear();
+                addResult('✅ Local storage cleared', 'success');
+            } catch (e) {
+                addResult(`❌ Could not clear storage: ${e.message}`, 'error');
+            }
+            
+            // Clear cache (si possible)
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    return Promise.all(
+                        names.map(name => {
+                            return caches.delete(name);
+                        })
+                    );
+                }).then(() => {
+                    addResult('✅ Cache cleared', 'success');
+                }).catch(e => {
+                    addResult(`❌ Could not clear cache: ${e.message}`, 'error');
+                });
+            }
+            
+            updateStatus('Data clearing completed');
+            addResult('You can now try to reload the main app', 'success');
+        }
+        
+        // Auto-run basic tests on load
+        window.addEventListener('load', () => {
+            setTimeout(runBasicTests, 500);
+        });
+    </script>
+</body>
+</html>
