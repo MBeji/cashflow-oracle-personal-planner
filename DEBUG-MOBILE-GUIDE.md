@@ -41,3 +41,48 @@
 ## 📱 Debug Console Mobile Intégrée
 
 Nous pouvons ajouter une console mobile directement dans l'app pour un debug plus facile !
+
+## 🚀 **URLS DE PRODUCTION VERCEL**
+
+**Déploiement réussi !** Voici les 3 versions accessibles en production :
+
+### 🔗 **URLs de Test Mobile Production :**
+
+1. **📱 Application Principale**
+   ```
+   https://cashflow-oracle-personal-planner-9ap45ys13.vercel.app/
+   ```
+
+2. **🔍 Page de Debug**
+   ```
+   https://cashflow-oracle-personal-planner-9ap45ys13.vercel.app/debug
+   ```
+
+3. **🚨 Page d'Urgence**
+   ```
+   https://cashflow-oracle-personal-planner-9ap45ys13.vercel.app/emergency.html
+   ```
+
+4. **📋 Page des Versions**
+   ```
+   https://cashflow-oracle-personal-planner-9ap45ys13.vercel.app/versions.html
+   ```
+
+### 📱 **Instructions de Test iPhone :**
+
+1. **Commencez par la page des versions** pour un aperçu complet
+2. **Si problème :** Utilisez la page d'urgence en premier
+3. **Debug complet :** Utilisez la page debug avec tests automatiques
+4. **Test normal :** Utilisez l'application principale
+
+### 🎯 **Avantages Production vs Local :**
+
+- ✅ **HTTPS sécurisé** (pas de blocage réseau iPhone)
+- ✅ **Accessible partout** (pas besoin du même WiFi)
+- ✅ **Performance optimisée** Vercel CDN
+- ✅ **Cache intelligent** pour chargement rapide
+- ✅ **URL stable** pour partage et tests
+
+### 🚀 **Prêt pour Test Mobile !**
+
+Toutes les corrections Chrome iPhone sont déployées en production. Testez maintenant directement sur votre iPhone avec les URLs ci-dessus !
