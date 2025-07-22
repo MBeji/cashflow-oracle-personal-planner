@@ -15,10 +15,12 @@ import { CompactView } from '@/components/CompactView';
 import { FixedAmountsManager } from '@/components/FixedAmountsManager';
 import { ExpenseCategoriesManager } from '@/components/ExpenseCategoriesManager';
 import { ExpenseStats } from '@/components/ExpenseStats';
+import { ArchiveManager } from '@/components/ArchiveManager';
+import { ArchivedMonthsView } from '@/components/ArchivedMonthsView';
 import { calculateMonthlyData } from '@/utils/cashflow';
 import { StorageService } from '@/utils/storage';
-import { CashFlowSettings as Settings, CustomExpense, FixedAmounts, MonthlyCustomExpense, ExpenseSettings } from '@/types/cashflow';
-import { Calculator, TrendingUp, Settings as SettingsIcon, LayoutGrid, List } from 'lucide-react';
+import { CashFlowSettings as Settings, CustomExpense, FixedAmounts, MonthlyCustomExpense, ExpenseSettings, ArchivedMonth } from '@/types/cashflow';
+import { Calculator, TrendingUp, Settings as SettingsIcon, LayoutGrid, List, Archive } from 'lucide-react';
 
 const defaultExpenseSettings: ExpenseSettings = {
   defaultCategories: [
@@ -76,12 +78,15 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
     customRecurringExpenses: [],
     fixedAmounts: defaultFixedAmounts,
     expenseSettings: defaultExpenseSettings,
-  });  const [customExpenses, setCustomExpenses] = useState<CustomExpense[]>([]);
-  const [vacationExpenses, setVacationExpenses] = useState<{ [key: string]: number }>(getDefaultVacationExpenses());
+    archivedMonths: [],
+    currentMonth: new Date().getMonth() + 1,
+    currentYear: new Date().getFullYear()
+  });const [customExpenses, setCustomExpenses] = useState<CustomExpense[]>([]);  const [vacationExpenses, setVacationExpenses] = useState<{ [key: string]: number }>(getDefaultVacationExpenses());
   const [chantierExpenses, setChantierExpenses] = useState<{ [key: string]: number }>({});
   const [monthlyCustomExpenses, setMonthlyCustomExpenses] = useState<{ [key: string]: MonthlyCustomExpense[] }>({});
   const [viewMode, setViewMode] = useState<'detailed' | 'compact'>('detailed');
   const [selectedMonthIndex, setSelectedMonthIndex] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<string>('forecast');
   // État pour gérer les prévisions de dépenses du mois en cours
   // Initialisé à 0 par défaut
   const [currentMonthExpenseForecast, setCurrentMonthExpenseForecast] = useState<number>(0);
@@ -123,17 +128,18 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
   useEffect(() => {
     StorageService.save('cashflow-monthly-custom-expenses', monthlyCustomExpenses);
   }, [monthlyCustomExpenses]);
-
   const monthlyData = useMemo(() => {
-    const currentDate = new Date();
-    const startMonth = currentDate.getMonth() + 1;
-    const startYear = currentDate.getFullYear();
+    // Utiliser le mois courant défini dans les settings, sinon le mois actuel
+    const startMonth = settings.currentMonth || new Date().getMonth() + 1;
+    const startYear = settings.currentYear || new Date().getFullYear();
     
     // Fusionner les dépenses vacances avec les dépenses éditables
     const mergedVacationExpenses = { ...vacationExpenses };
     
     // Fusionner les dépenses chantier avec les dépenses éditables
-    const mergedChantierExpenses = { ...chantierExpenses };    return calculateMonthlyData(
+    const mergedChantierExpenses = { ...chantierExpenses };
+
+    return calculateMonthlyData(
       startMonth,
       startYear,
       settings.monthsToDisplay,
@@ -203,6 +209,31 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
     if (data.chantierExpenses) setChantierExpenses(data.chantierExpenses);
     if (data.monthlyCustomExpenses) setMonthlyCustomExpenses(data.monthlyCustomExpenses);
     alert('Données importées avec succès !');
+  };
+  const handleArchive = (archivedMonth: ArchivedMonth) => {
+    setSettings(prev => ({
+      ...prev,
+      archivedMonths: [...prev.archivedMonths, archivedMonth],
+      currentBalance: archivedMonth.actualData.endingBalance,
+      currentMonth: archivedMonth.month === 12 ? 1 : archivedMonth.month + 1,
+      currentYear: archivedMonth.month === 12 ? archivedMonth.year + 1 : archivedMonth.year
+    }));
+    
+    // Optionnel : Réinitialiser les prévisions du mois courant
+    setCurrentMonthExpenseForecast(0);
+  };
+
+  const handleArchiveComplete = () => {
+    // Revenir à l'onglet principal après archivage
+    setActiveTab('forecast');
+    
+    // Afficher une notification de succès
+    const nextMonthName = settings.currentMonth === 12 ? 'Janvier' : 
+      new Date(2000, settings.currentMonth || 0, 1).toLocaleDateString('fr-FR', { month: 'long' });
+    
+    setTimeout(() => {
+      alert(`✅ Archivage réussi !\n${nextMonthName} est maintenant le mois courant.`);
+    }, 500);
   };const handleReset = () => {
     if (confirm('Êtes-vous sûr de vouloir réinitialiser toutes les données ?')) {      const defaultSettings: Settings = {
         currentBalance: 3500,
@@ -212,7 +243,10 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
         customRecurringExpenses: [],
         fixedAmounts: defaultFixedAmounts,
         expenseSettings: defaultExpenseSettings,
-      };      setSettings(defaultSettings);
+        archivedMonths: [],
+        currentMonth: new Date().getMonth() + 1,
+        currentYear: new Date().getFullYear()
+      };setSettings(defaultSettings);
       setCustomExpenses([]);
       setVacationExpenses(getDefaultVacationExpenses());
       setChantierExpenses({});
@@ -228,6 +262,15 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
       alert('Données réinitialisées !');
     }
   };
+  const getCurrentMonthDisplay = () => {
+    const currentMonth = settings.currentMonth || new Date().getMonth() + 1;
+    const currentYear = settings.currentYear || new Date().getFullYear();
+    const monthNames = [
+      'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+      'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+    ];
+    return `${monthNames[currentMonth - 1]} ${currentYear}`;
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -239,7 +282,17 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
           <p className="text-lg text-muted-foreground">
             Prévision et suivi de votre trésorerie personnelle
           </p>
-        </div>        {/* Solde actuel - Maintenant dans la page principale */}
+          <div className="mt-3">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+              📅 Mois courant : {getCurrentMonthDisplay()}
+              {settings.archivedMonths.length > 0 && (
+                <span className="ml-2 text-xs bg-blue-200 px-2 py-0.5 rounded-full">
+                  {settings.archivedMonths.length} mois archivé{settings.archivedMonths.length > 1 ? 's' : ''}
+                </span>
+              )}
+            </span>
+          </div>
+        </div>{/* Solde actuel - Maintenant dans la page principale */}
         <div className="mb-6 max-w-md mx-auto">
           <div className="space-y-2">
             <label htmlFor="currentBalance" className="text-sm font-medium">
@@ -256,10 +309,8 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
               className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
-        </div>
-
-        <Tabs defaultValue="forecast" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+        </div>        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="forecast" className="flex items-center gap-2">
               <Calculator className="h-4 w-4" />
               Prévisions
@@ -267,6 +318,14 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
             <TabsTrigger value="statistics" className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               Statistiques
+            </TabsTrigger>            <TabsTrigger value="archives" className="flex items-center gap-2">
+              <Archive className="h-4 w-4" />
+              Archives
+              {settings.archivedMonths.length > 0 && (
+                <span className="ml-1 bg-blue-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[1.5rem] text-center">
+                  {settings.archivedMonths.length}
+                </span>
+              )}
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <SettingsIcon className="h-4 w-4" />
@@ -275,6 +334,15 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
           </TabsList>          <TabsContent value="forecast" className="space-y-6">
             <FinancialSummary data={monthlyData} alertThreshold={settings.alertThreshold} />
             <CashFlowChart data={monthlyData} alertThreshold={settings.alertThreshold} />
+              {/* Gestionnaire d'archivage */}
+            {monthlyData.length > 0 && (
+              <ArchiveManager
+                currentMonthData={monthlyData[0]}
+                onArchive={handleArchive}
+                onArchiveComplete={handleArchiveComplete}
+                className="mb-6"
+              />
+            )}
             
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">Détail mensuel</h3>
@@ -296,7 +364,7 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
                   Détaillé
                 </Button>
               </div>
-            </div>            {viewMode === 'compact' ? (              <CompactView 
+            </div>{viewMode === 'compact' ? (              <CompactView 
                 data={monthlyData}
                 alertThreshold={settings.alertThreshold}
                 onMonthClick={(index) => {
@@ -328,6 +396,32 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
               expenseSettings={settings.expenseSettings}
               currentDate={new Date()}
             />
+          </TabsContent>          <TabsContent value="archives" className="space-y-6">
+            <div className="max-w-6xl mx-auto">
+              {settings.archivedMonths.length === 0 && (
+                <div className="text-center py-12">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-md mx-auto">
+                    <Archive className="h-12 w-12 text-blue-500 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-blue-800 mb-2">
+                      Aucun mois archivé
+                    </h3>
+                    <p className="text-blue-600 text-sm mb-4">
+                      Lorsque vous archiverez votre premier mois, l'historique apparaîtra ici.
+                    </p>
+                    <Button 
+                      onClick={() => setActiveTab('forecast')}
+                      variant="outline"
+                      className="border-blue-300 text-blue-700 hover:bg-blue-100"
+                    >
+                      Retour aux prévisions
+                    </Button>
+                  </div>
+                </div>
+              )}
+              <ArchivedMonthsView 
+                archivedMonths={settings.archivedMonths}
+              />
+            </div>
           </TabsContent><TabsContent value="settings" className="space-y-6">
             <div className="max-w-4xl mx-auto space-y-6">
               <AdvancedSettings 

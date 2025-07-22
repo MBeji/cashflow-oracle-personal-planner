@@ -20,6 +20,42 @@ export interface MonthlyData {
     chantier: number;
   };
   endingBalance: number;
+  isArchived?: boolean;
+  archivedAt?: string;
+}
+
+// Interface pour les données archivées d'un mois
+export interface ArchivedMonth {
+  month: number;
+  year: number;
+  plannedData: MonthlyData;
+  actualData: MonthlyData;
+  archivedAt: string;
+  notes?: string;
+}
+
+// Interface pour la correction des données avant archivage
+export interface MonthlyDataCorrection {
+  month: number;
+  year: number;
+  actualRevenues: {
+    salary: number;
+    fuel: number;
+    healthInsurance: number;
+    bonus: number;
+    custom: CustomRevenue[];
+  };
+  actualExpenses: {
+    debt: number;
+    currentExpenses: number;
+    fuel: number;
+    healthInsurance: number;
+    vacation: number;
+    school: number;
+    custom: CustomExpense[];
+    chantier: number;
+  };
+  notes?: string;
 }
 
 export interface CustomExpense {
@@ -46,6 +82,9 @@ export interface CashFlowSettings {
   customRecurringExpenses: CustomExpense[];
   fixedAmounts: FixedAmounts;
   expenseSettings: ExpenseSettings;
+  archivedMonths: ArchivedMonth[];
+  currentMonth?: number;
+  currentYear?: number;
 }
 
 export interface FixedAmounts {
