@@ -9,22 +9,14 @@
       }
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/emergency.html",
-      "dest": "/emergency.html"
+      "source": "/debug",
+      "destination": "/index.html"
     },
     {
-      "src": "/versions.html",
-      "dest": "/versions.html"
-    },
-    {
-      "src": "/debug",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/((?!emergency\\.html|versions\\.html).*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
@@ -42,7 +34,7 @@
       ]
     },
     {
-      "source": "/emergency.html",
+      "source": "/(emergency|versions)\\.html",
       "headers": [
         {
           "key": "Cache-Control",
