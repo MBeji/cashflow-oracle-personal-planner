@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "cashflow-mobile-app",
   "builds": [
     {
       "src": "package.json",
@@ -14,6 +13,10 @@
     {
       "src": "/emergency.html",
       "dest": "/emergency.html"
+    },
+    {
+      "src": "/versions.html",
+      "dest": "/versions.html"
     },
     {
       "src": "/debug",
@@ -60,10 +63,5 @@
         }
       ]
     }
-  ],
-  "functions": {
-    "src/pages/api/*.js": {
-      "runtime": "nodejs18.x"
-    }
-  }
+  ]
 }
