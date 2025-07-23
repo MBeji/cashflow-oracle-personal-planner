@@ -17,10 +17,11 @@ import { ExpenseCategoriesManager } from '@/components/ExpenseCategoriesManager'
 import { ExpenseStats } from '@/components/ExpenseStats';
 import { ArchiveManager } from '@/components/ArchiveManager';
 import { ArchivedMonthsView } from '@/components/ArchivedMonthsView';
+import { ExpensePlanningManager } from '@/components/ExpensePlanningManager';
 import { calculateMonthlyData } from '@/utils/cashflow';
 import { StorageService } from '@/utils/storage';
-import { CashFlowSettings as Settings, CustomExpense, FixedAmounts, MonthlyCustomExpense, ExpenseSettings, ArchivedMonth } from '@/types/cashflow';
-import { Calculator, TrendingUp, Settings as SettingsIcon, LayoutGrid, List, Archive } from 'lucide-react';
+import { CashFlowSettings as Settings, CustomExpense, FixedAmounts, MonthlyCustomExpense, ExpenseSettings, ArchivedMonth, ExpensePlanningSettings } from '@/types/cashflow';
+import { Calculator, TrendingUp, Settings as SettingsIcon, LayoutGrid, List, Archive, Calendar } from 'lucide-react';
 
 const defaultExpenseSettings: ExpenseSettings = {
   defaultCategories: [
@@ -66,8 +67,12 @@ const defaultFixedAmounts: FixedAmounts = {
   debt: 6000,
   currentExpenses: 3300, // 2000 + 200 + 500 + 200 + 400 = 3300 TND
   fuelExpense: 500,
-  healthInsuranceExpense: 1000,
-  schoolExpense: 15000
+  healthInsuranceExpense: 1000,  schoolExpense: 15000
+};
+
+const defaultExpensePlanningSettings: ExpensePlanningSettings = {
+  monthlyPlannings: [],
+  defaultAmount: 5000 // Montant par défaut utilisé actuellement
 };
 
 const Index = () => {  const [settings, setSettings] = useState<Settings>({
@@ -78,6 +83,7 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
     customRecurringExpenses: [],
     fixedAmounts: defaultFixedAmounts,
     expenseSettings: defaultExpenseSettings,
+    expensePlanningSettings: defaultExpensePlanningSettings,
     archivedMonths: [],
     currentMonth: new Date().getMonth() + 1,
     currentYear: new Date().getFullYear()
@@ -89,18 +95,21 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
   const [activeTab, setActiveTab] = useState<string>('forecast');
   // État pour gérer les prévisions de dépenses du mois en cours
   // Initialisé à 0 par défaut
-  const [currentMonthExpenseForecast, setCurrentMonthExpenseForecast] = useState<number>(0);
-  // Charger les données au démarrage
+  const [currentMonthExpenseForecast, setCurrentMonthExpenseForecast] = useState<number>(0);  // Charger les données au démarrage
   useEffect(() => {
     const savedSettings = StorageService.load('cashflow-settings', settings);
     // S'assurer que fixedAmounts existe dans les données chargées
     if (!savedSettings.fixedAmounts) {
       savedSettings.fixedAmounts = defaultFixedAmounts;
     }
+    // S'assurer que expensePlanningSettings existe dans les données chargées
+    if (!savedSettings.expensePlanningSettings) {
+      savedSettings.expensePlanningSettings = defaultExpensePlanningSettings;
+    }
     const savedCustomExpenses = StorageService.load('cashflow-custom-expenses', []);
     const savedVacationExpenses = StorageService.load('cashflow-vacation-expenses', getDefaultVacationExpenses());
     const savedChantierExpenses = StorageService.load('cashflow-chantier-expenses', {});
-    const savedMonthlyCustomExpenses = StorageService.load('cashflow-monthly-custom-expenses', {});    setSettings(savedSettings);
+    const savedMonthlyCustomExpenses = StorageService.load('cashflow-monthly-custom-expenses', {});setSettings(savedSettings);
     setCustomExpenses(savedCustomExpenses);
     setVacationExpenses(savedVacationExpenses);
     setChantierExpenses(savedChantierExpenses);
@@ -137,9 +146,7 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
     const mergedVacationExpenses = { ...vacationExpenses };
     
     // Fusionner les dépenses chantier avec les dépenses éditables
-    const mergedChantierExpenses = { ...chantierExpenses };
-
-    return calculateMonthlyData(
+    const mergedChantierExpenses = { ...chantierExpenses };    return calculateMonthlyData(
       startMonth,
       startYear,
       settings.monthsToDisplay,
@@ -151,7 +158,8 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
       settings.fixedAmounts,
       monthlyCustomExpenses,
       settings.expenseSettings,
-      currentMonthExpenseForecast
+      currentMonthExpenseForecast,
+      settings.expensePlanningSettings
     );
   }, [settings, customExpenses, chantierExpenses, vacationExpenses, monthlyCustomExpenses, currentMonthExpenseForecast]);
 
@@ -243,6 +251,7 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
         customRecurringExpenses: [],
         fixedAmounts: defaultFixedAmounts,
         expenseSettings: defaultExpenseSettings,
+        expensePlanningSettings: defaultExpensePlanningSettings,
         archivedMonths: [],
         currentMonth: new Date().getMonth() + 1,
         currentYear: new Date().getFullYear()
@@ -310,7 +319,7 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
             />
           </div>
         </div>        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="forecast" className="flex items-center gap-2">
               <Calculator className="h-4 w-4" />
               Prévisions
@@ -318,7 +327,12 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
             <TabsTrigger value="statistics" className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               Statistiques
-            </TabsTrigger>            <TabsTrigger value="archives" className="flex items-center gap-2">
+            </TabsTrigger>
+            <TabsTrigger value="planning" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Planification
+            </TabsTrigger>
+            <TabsTrigger value="archives" className="flex items-center gap-2">
               <Archive className="h-4 w-4" />
               Archives
               {settings.archivedMonths.length > 0 && (
@@ -331,7 +345,7 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
               <SettingsIcon className="h-4 w-4" />
               Paramètres
             </TabsTrigger>
-          </TabsList>          <TabsContent value="forecast" className="space-y-6">
+          </TabsList><TabsContent value="forecast" className="space-y-6">
             <FinancialSummary data={monthlyData} alertThreshold={settings.alertThreshold} />
             <CashFlowChart data={monthlyData} alertThreshold={settings.alertThreshold} />
               {/* Gestionnaire d'archivage */}
@@ -389,14 +403,29 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
                 chantierExpenses={chantierExpenses}
                 monthlyCustomExpenses={monthlyCustomExpenses}
               />
-            )}
-          </TabsContent>          <TabsContent value="statistics" className="space-y-6">
+            )}          </TabsContent>
+
+          <TabsContent value="statistics" className="space-y-6">
             <Statistics data={monthlyData} alertThreshold={settings.alertThreshold} />
             <ExpenseStats 
               expenseSettings={settings.expenseSettings}
               currentDate={new Date()}
             />
-          </TabsContent>          <TabsContent value="archives" className="space-y-6">
+          </TabsContent>
+
+          <TabsContent value="planning" className="space-y-6">
+            <ExpensePlanningManager
+              settings={settings.expensePlanningSettings}
+              onSettingsChange={(newPlanningSettings) => {
+                setSettings(prev => ({
+                  ...prev,
+                  expensePlanningSettings: newPlanningSettings
+                }));
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="archives" className="space-y-6">
             <div className="max-w-6xl mx-auto">
               {settings.archivedMonths.length === 0 && (
                 <div className="text-center py-12">

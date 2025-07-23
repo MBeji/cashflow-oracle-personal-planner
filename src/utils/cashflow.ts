@@ -1,4 +1,4 @@
-import { MonthlyData, CustomExpense, BonusSchedule, CustomRevenue, FixedAmounts, MonthlyCustomExpense, ExpenseSettings } from '@/types/cashflow';
+import { MonthlyData, CustomExpense, BonusSchedule, CustomRevenue, FixedAmounts, MonthlyCustomExpense, ExpenseSettings, ExpensePlanningSettings } from '@/types/cashflow';
 
 export function calculateMonthlyData(
   startMonth: number,
@@ -12,7 +12,8 @@ export function calculateMonthlyData(
   fixedAmounts: FixedAmounts,
   monthlyCustomExpenses: { [key: string]: MonthlyCustomExpense[] } = {},
   expenseSettings?: ExpenseSettings,
-  currentMonthExpenseForecast?: number
+  currentMonthExpenseForecast?: number,
+  expensePlanningSettings?: ExpensePlanningSettings
 ): MonthlyData[] {
   const result: MonthlyData[] = [];
   let currentBalance = initialBalance;  for (let i = 0; i < months; i++) {
@@ -65,11 +66,23 @@ export function calculateMonthlyData(
     // Vacation expenses (July and August)
     const vacationExpense = vacationExpenses[monthKey] || 0;    // Chantier expenses
     const chantierExpense = chantierExpenses[monthKey] || 0;    // Monthly custom expenses
-    const monthlyCustomExpensesTotal = (monthlyCustomExpenses[monthKey] || []).reduce((sum, exp) => sum + exp.amount, 0);
-
-    // Calculate current expenses from categories if available
+    const monthlyCustomExpensesTotal = (monthlyCustomExpenses[monthKey] || []).reduce((sum, exp) => sum + exp.amount, 0);    // Calculate current expenses from planning first, then categories if available, then default
     let currentExpensesAmount = fixedAmounts.currentExpenses;
-    if (expenseSettings?.monthlyBreakdowns) {
+    
+    // Priority 1: Check if there's a specific planning for this month
+    if (expensePlanningSettings?.monthlyPlannings) {
+      const planning = expensePlanningSettings.monthlyPlannings.find(
+        p => p.month === currentMonth && p.year === currentYear
+      );
+      if (planning) {
+        currentExpensesAmount = planning.totalAmount;
+      } else {
+        // Use default amount from planning settings if no specific planning
+        currentExpensesAmount = expensePlanningSettings.defaultAmount;
+      }
+    }
+    // Priority 2: Check expense categories breakdown (legacy system)
+    else if (expenseSettings?.monthlyBreakdowns) {
       const breakdown = expenseSettings.monthlyBreakdowns.find(
         b => b.month === (currentMonth - 1) && b.year === currentYear
       );

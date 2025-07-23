@@ -82,6 +82,7 @@ export interface CashFlowSettings {
   customRecurringExpenses: CustomExpense[];
   fixedAmounts: FixedAmounts;
   expenseSettings: ExpenseSettings;
+  expensePlanningSettings: ExpensePlanningSettings;
   archivedMonths: ArchivedMonth[];
   currentMonth?: number;
   currentYear?: number;
@@ -141,4 +142,27 @@ export interface ExpenseSettings {
   defaultCategories: ExpenseCategory[];
   defaultSubcategories: ExpenseSubCategory[];
   monthlyBreakdowns: MonthlyExpenseBreakdown[];
+}
+
+// Types pour la planification des dépenses mensuelles
+export interface PlannedExpenseCategory {
+  id: string;
+  name: string;
+  amount: number;
+  color?: string;
+  isDefault: boolean; // Si c'est une catégorie standard ou personnalisée
+}
+
+export interface MonthlyExpensePlanning {
+  month: number;
+  year: number;
+  categories: PlannedExpenseCategory[];
+  totalAmount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ExpensePlanningSettings {
+  monthlyPlannings: MonthlyExpensePlanning[];
+  defaultAmount: number; // Montant par défaut si aucune planification (5000)
 }
