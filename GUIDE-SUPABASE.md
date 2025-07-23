@@ -26,8 +26,8 @@ L'application intègre maintenant Supabase pour offrir :
 
 2. Remplissez les variables dans `.env.local` :
    ```env
-   VITE_SUPABASE_URL=https://votre-projet.supabase.co
-   VITE_SUPABASE_ANON_KEY=votre_clé_publique_ici
+   VITE_SUPABASE_URL=https://uqucuqqbtlwdsewyqjbj.supabase.co
+   VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxdWN1cXFidGx3ZHNld3lxamJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyODA1MjQsImV4cCI6MjA2ODg1NjUyNH0.Lg3YzkhtOaU_0pVDx7ojfh_ThEa4cky83j-6u8BQbks
    ```
 
 3. Trouvez ces valeurs dans votre projet Supabase :
