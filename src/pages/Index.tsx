@@ -18,7 +18,7 @@ import { ExpenseStats } from '@/components/ExpenseStats';
 import { ArchiveManager } from '@/components/ArchiveManager';
 import { ArchivedMonthsView } from '@/components/ArchivedMonthsView';
 import { ExpensePlanningManager } from '@/components/ExpensePlanningManager';
-import { CloudSyncManager } from '@/components/CloudSyncManager';
+import { UserProfile } from '@/components/UserProfile';
 import { calculateMonthlyData } from '@/utils/cashflow';
 import { StorageService } from '@/utils/storage';
 import { CashFlowSettings as Settings, CustomExpense, FixedAmounts, MonthlyCustomExpense, ExpenseSettings, ArchivedMonth, ExpensePlanningSettings } from '@/types/cashflow';
@@ -281,9 +281,28 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
     ];
     return `${monthNames[currentMonth - 1]} ${currentYear}`;
   };
-
   return (
     <div className="min-h-screen bg-background">
+      {/* Header avec navigation */}
+      <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="flex items-center justify-between h-14">
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-foreground">💰 Cash Flow</h2>
+            </div>
+            
+            <UserProfile
+              settings={settings}
+              onSettingsUpdate={setSettings}
+              archivedMonths={settings.archivedMonths}
+              onArchivedMonthsUpdate={(months) => setSettings(prev => ({ ...prev, archivedMonths: months }))}
+              expensePlanning={settings.expensePlanningSettings}
+              onExpensePlanningUpdate={(planning) => setSettings(prev => ({ ...prev, expensePlanningSettings: planning }))}
+            />
+          </div>
+        </div>
+      </header>
+
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-foreground mb-2">
@@ -494,15 +513,6 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
               </div>              <ChantierManager 
                 chantierExpenses={chantierExpenses}
                 onChantierChange={setChantierExpenses}
-              />
-              
-              <CloudSyncManager
-                settings={settings}
-                onSettingsUpdate={setSettings}
-                archivedMonths={settings.archivedMonths}
-                onArchivedMonthsUpdate={(months) => setSettings(prev => ({ ...prev, archivedMonths: months }))}
-                expensePlanning={settings.expensePlanningSettings}
-                onExpensePlanningUpdate={(planning) => setSettings(prev => ({ ...prev, expensePlanningSettings: planning }))}
               />
               
               <DataManagement
