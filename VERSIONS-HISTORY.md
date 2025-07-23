@@ -1,6 +1,37 @@
 # 📋 Historique des Versions - Cash Flow Personnel
 
-## 🌐 **v1.5.0-supabase-ready** *(Version Cloud Configurée - 23 Juillet 2025)* ✅
+## � **v1.5.1-modern-header** *(UX Moderne - 23 Juillet 2025)* ✨
+
+### 🚀 **AMÉLIORATION UX MAJEURE - HEADER MODERNE**
+
+**🎯 Repositionnement Cloud Interface :**
+- **👤 Profil utilisateur** : Déplacé en haut à droite (standard des apps web)
+- **🔗 Connexion permanente** : Accessible depuis tous les onglets
+- **📊 Statut visuel** : Badge de synchronisation toujours visible
+- **🎨 Design moderne** : Interface type Gmail/GitHub/Discord
+
+**🏗️ Nouveau Composant UserProfile :**
+- `UserProfile.tsx` : Interface compacte pour header
+- **Avatar utilisateur** avec initiales de l'email
+- **Dropdown menu** avec toutes les actions cloud
+- **Badge de statut** : Cloud/Sync.../OK/Erreur
+- **Actions rapides** : Synchroniser, Sauvegarder, Restaurer
+
+**🎨 Architecture Header :**
+- **Header permanent** avec navigation fixe
+- **Logo/Titre** : "💰 Cash Flow" (gauche)
+- **Profil utilisateur** : Connexion/Avatar (droite)
+- **Responsive** : Design adaptatif mobile/desktop
+
+**📱 États d'affichage :**
+- **Non connecté** : Bouton "Se connecter" + icône cloud
+- **Connecté** : Avatar + badge statut + menu déroulant
+- **En cours de sync** : Animation de loading visible
+- **Dernière sync** : Timestamp affiché dans le menu
+
+---
+
+## �🌐 **v1.5.0-supabase-ready** *(Version Cloud Configurée - 23 Juillet 2025)* ✅
 
 ### 🚀 **INTÉGRATION CLOUD SUPABASE - COMPLÈTEMENT FONCTIONNELLE**
 
