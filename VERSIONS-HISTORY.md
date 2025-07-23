@@ -1,6 +1,24 @@
 # 📋 Historique des Versions - Cash Flow Personnel
 
-## 🚀 **v1.3.0-archive-feature** *(Version Actuelle - 22 Juillet 2025)*
+## 🚀 **v1.3.1-yearly-kpi** *(Version Actuelle - 22 Juillet 2025)*
+
+### ✨ **AMÉLIORATION MAJEURE : KPI ANNÉE CALENDAIRE**
+
+**📊 KPI Optimisés :**
+- **📅 Calcul Année Calendaire** : KPI basés sur 12 mois (janvier à décembre)
+- **🔄 Combinaison Intelligent** : Données réelles (passées) + prévisionnelles (futures)
+- **⚖️ Moyennes Cohérentes** : Toujours divisées par 12 mois pour consistance annuelle
+- **🎯 Affichage Annuel** : Libellés indiquent clairement l'année de référence
+
+**🎯 Amélioration des Indicateurs :**
+- **Revenus moyens** : Moyenne sur l'année calendaire complète
+- **Dépenses moyennes** : Calcul annuel cohérent (hors dette)
+- **Capacité d'épargne** : Performance annuelle réelle
+- **Taux d'épargne** : Pourcentage basé sur l'année entière
+
+---
+
+## 🚀 **v1.3.0-archive-feature** *(Version Précédente - 22 Juillet 2025)*
 
 ### ✨ **FONCTIONNALITÉ MAJEURE : ARCHIVAGE MENSUEL**
 
@@ -74,11 +92,12 @@
 
 ## 🎯 **Version Recommandée**
 
-### **✅ v1.3.0-archive-feature** *(Actuelle)*
+### **✅ v1.3.1-yearly-kpi** *(Actuelle)*
 
 **Pourquoi cette version ?**
 - 🔥 **Fonctionnalité complète** : Archivage mensuel opérationnel
-- 📊 **KPI avancés** : Indicateurs financiers précis
+- 📊 **KPI année calendaire** : Indicateurs basés sur 12 mois cohérents
+- 📅 **Calcul intelligent** : Combinaison données réelles et prévisionnelles
 - 📱 **Mobile parfait** : Compatible iPhone/Chrome
 - 💾 **Historique permanent** : Sauvegarde de tous les mois
 - 🎮 **UX optimisée** : Workflow intuitif et guidé
@@ -119,7 +138,7 @@
 ```bash
 git clone https://github.com/MBeji/cashflow-oracle-personal-planner.git
 cd cashflow-oracle-personal-planner
-git checkout v1.3.0-archive-feature
+git checkout v1.3.1-yearly-kpi
 npm install
 npm run dev
 ```
