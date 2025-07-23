@@ -28,6 +28,7 @@ import { AuthService } from '@/services/AuthService';
 import { DataService } from '@/services/DataService';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { CashFlowSettings, ArchivedMonth, ExpensePlanningSettings } from '@/types/cashflow';
+import { createInitialUserSettings } from '@/config/defaultUserConfig';
 
 interface UserProfileProps {
   settings: CashFlowSettings;
@@ -78,9 +79,20 @@ export const UserProfile: React.FC<UserProfileProps> = ({
       setIsLoading(false);
     }
   };
-
   const handleLogin = (loggedInUser: SupabaseUser) => {
     setUser(loggedInUser);
+    
+    // Vérifier si l'utilisateur a des paramètres personnalisés ou utiliser les valeurs par défaut
+    const userSpecificSettings = createInitialUserSettings(loggedInUser.email || undefined);
+    
+    // Si c'est la première connexion, on applique la configuration spécifique
+    // Pour Mohamed Beji, cela appliquera ses valeurs actuelles
+    // Pour les nouveaux utilisateurs, cela appliquera les valeurs par défaut (salaire 6000, etc.)
+    if (!settings.archivedMonths || settings.archivedMonths.length === 0) {
+      // Première connexion ou pas de données existantes
+      onSettingsUpdate(userSpecificSettings);
+    }
+    
     // Auto-sync après connexion
     setTimeout(() => handleSync(), 1000);
   };

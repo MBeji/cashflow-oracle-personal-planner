@@ -23,28 +23,7 @@ import { calculateMonthlyData } from '@/utils/cashflow';
 import { StorageService } from '@/utils/storage';
 import { CashFlowSettings as Settings, CustomExpense, FixedAmounts, MonthlyCustomExpense, ExpenseSettings, ArchivedMonth, ExpensePlanningSettings } from '@/types/cashflow';
 import { Calculator, TrendingUp, Settings as SettingsIcon, LayoutGrid, List, Archive, Calendar } from 'lucide-react';
-
-const defaultExpenseSettings: ExpenseSettings = {
-  defaultCategories: [
-    { id: '1', name: 'Alimentation & Maison', amount: 2000, color: '#ef4444' },
-    { id: '2', name: 'Femme de ménage', amount: 200, color: '#f97316' },
-    { id: '3', name: 'Enfants (Études & Club)', amount: 500, color: '#eab308' },
-    { id: '4', name: 'Factures', amount: 200, color: '#22c55e' },
-    { id: '5', name: 'Restaurants & Sorties', amount: 400, color: '#a855f7' }
-  ],
-  defaultSubcategories: [
-    { id: '1-1', name: 'Alimentation', amount: 1500, parentCategoryId: '1' },
-    { id: '1-2', name: 'Produits ménagers', amount: 300, parentCategoryId: '1' },
-    { id: '1-3', name: 'Besoins maison récurrents', amount: 200, parentCategoryId: '1' },
-    { id: '3-1', name: 'Frais scolaires', amount: 250, parentCategoryId: '3' },
-    { id: '3-2', name: 'Club sportif/activités', amount: 250, parentCategoryId: '3' },
-    { id: '4-1', name: 'Eau & Électricité', amount: 100, parentCategoryId: '4' },
-    { id: '4-2', name: 'Internet', amount: 100, parentCategoryId: '4' },
-    { id: '5-1', name: 'Restaurants', amount: 250, parentCategoryId: '5' },
-    { id: '5-2', name: 'Sorties & Loisirs familiaux', amount: 150, parentCategoryId: '5' }
-  ],
-  monthlyBreakdowns: []
-};
+import { createInitialUserSettings, getDefaultConfigForUser } from '@/config/defaultUserConfig';
 
 // Fonction pour générer les dépenses de vacances par défaut pour l'année courante
 const getDefaultVacationExpenses = () => {
@@ -55,62 +34,46 @@ const getDefaultVacationExpenses = () => {
   };
 };
 
-const defaultFixedAmounts: FixedAmounts = {
-  salary: 12750,
-  fuelRevenue: 500,
-  healthInsuranceRevenue: 1000,
-  bonusMultipliers: {
-    march: 19125, // 1.5 * 12750
-    june: 6375,   // 0.5 * 12750
-    september: 19125, // 1.5 * 12750
-    december: 6375    // 0.5 * 12750
-  },
-  debt: 6000,
-  currentExpenses: 3300, // 2000 + 200 + 500 + 200 + 400 = 3300 TND
-  fuelExpense: 500,
-  healthInsuranceExpense: 1000,  schoolExpense: 15000
-};
-
-const defaultExpensePlanningSettings: ExpensePlanningSettings = {
-  monthlyPlannings: [],
-  defaultAmount: 5000 // Montant par défaut utilisé actuellement
-};
-
-const Index = () => {  const [settings, setSettings] = useState<Settings>({
-    currentBalance: 3500,
-    alertThreshold: 2000,
-    monthsToDisplay: 20,
-    customRevenues: [],
-    customRecurringExpenses: [],
-    fixedAmounts: defaultFixedAmounts,
-    expenseSettings: defaultExpenseSettings,
-    expensePlanningSettings: defaultExpensePlanningSettings,
-    archivedMonths: [],
-    currentMonth: new Date().getMonth() + 1,
-    currentYear: new Date().getFullYear()
-  });const [customExpenses, setCustomExpenses] = useState<CustomExpense[]>([]);  const [vacationExpenses, setVacationExpenses] = useState<{ [key: string]: number }>(getDefaultVacationExpenses());
+const Index = () => {
+  // Initialisation avec les valeurs par défaut configurables
+  const [settings, setSettings] = useState<Settings>(() => {
+    // Pour l'instant, on utilise la config par défaut
+    // Quand l'utilisateur se connecte, on mettra à jour avec ses valeurs spécifiques
+    return createInitialUserSettings();
+  });
+  
+  const [customExpenses, setCustomExpenses] = useState<CustomExpense[]>([]);
+  const [vacationExpenses, setVacationExpenses] = useState<{ [key: string]: number }>(getDefaultVacationExpenses());
   const [chantierExpenses, setChantierExpenses] = useState<{ [key: string]: number }>({});
   const [monthlyCustomExpenses, setMonthlyCustomExpenses] = useState<{ [key: string]: MonthlyCustomExpense[] }>({});
   const [viewMode, setViewMode] = useState<'detailed' | 'compact'>('detailed');
   const [selectedMonthIndex, setSelectedMonthIndex] = useState<number | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('forecast');
-  // État pour gérer les prévisions de dépenses du mois en cours
+  const [activeTab, setActiveTab] = useState<string>('forecast');  // État pour gérer les prévisions de dépenses du mois en cours
   // Initialisé à 0 par défaut
-  const [currentMonthExpenseForecast, setCurrentMonthExpenseForecast] = useState<number>(0);  // Charger les données au démarrage
+  const [currentMonthExpenseForecast, setCurrentMonthExpenseForecast] = useState<number>(0);
+
+  // Charger les données au démarrage
   useEffect(() => {
-    const savedSettings = StorageService.load('cashflow-settings', settings);
-    // S'assurer que fixedAmounts existe dans les données chargées
+    const defaultConfig = createInitialUserSettings();
+    const savedSettings = StorageService.load('cashflow-settings', defaultConfig);
+    
+    // S'assurer que les nouvelles propriétés existent dans les données chargées
     if (!savedSettings.fixedAmounts) {
-      savedSettings.fixedAmounts = defaultFixedAmounts;
+      savedSettings.fixedAmounts = defaultConfig.fixedAmounts;
     }
-    // S'assurer que expensePlanningSettings existe dans les données chargées
     if (!savedSettings.expensePlanningSettings) {
-      savedSettings.expensePlanningSettings = defaultExpensePlanningSettings;
+      savedSettings.expensePlanningSettings = defaultConfig.expensePlanningSettings;
     }
+    if (!savedSettings.expenseSettings) {
+      savedSettings.expenseSettings = defaultConfig.expenseSettings;
+    }
+    
     const savedCustomExpenses = StorageService.load('cashflow-custom-expenses', []);
     const savedVacationExpenses = StorageService.load('cashflow-vacation-expenses', getDefaultVacationExpenses());
     const savedChantierExpenses = StorageService.load('cashflow-chantier-expenses', {});
-    const savedMonthlyCustomExpenses = StorageService.load('cashflow-monthly-custom-expenses', {});setSettings(savedSettings);
+    const savedMonthlyCustomExpenses = StorageService.load('cashflow-monthly-custom-expenses', {});
+    
+    setSettings(savedSettings);
     setCustomExpenses(savedCustomExpenses);
     setVacationExpenses(savedVacationExpenses);
     setChantierExpenses(savedChantierExpenses);
@@ -243,20 +206,12 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
     setTimeout(() => {
       alert(`✅ Archivage réussi !\n${nextMonthName} est maintenant le mois courant.`);
     }, 500);
-  };const handleReset = () => {
-    if (confirm('Êtes-vous sûr de vouloir réinitialiser toutes les données ?')) {      const defaultSettings: Settings = {
-        currentBalance: 3500,
-        alertThreshold: 2000,
-        monthsToDisplay: 20,
-        customRevenues: [],
-        customRecurringExpenses: [],
-        fixedAmounts: defaultFixedAmounts,
-        expenseSettings: defaultExpenseSettings,
-        expensePlanningSettings: defaultExpensePlanningSettings,
-        archivedMonths: [],
-        currentMonth: new Date().getMonth() + 1,
-        currentYear: new Date().getFullYear()
-      };setSettings(defaultSettings);
+  };  const handleReset = () => {
+    if (confirm('Êtes-vous sûr de vouloir réinitialiser toutes les données ?')) {
+      // Utiliser la configuration par défaut
+      const defaultSettings = createInitialUserSettings();
+      
+      setSettings(defaultSettings);
       setCustomExpenses([]);
       setVacationExpenses(getDefaultVacationExpenses());
       setChantierExpenses({});
