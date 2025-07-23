@@ -18,6 +18,7 @@ import { ExpenseStats } from '@/components/ExpenseStats';
 import { ArchiveManager } from '@/components/ArchiveManager';
 import { ArchivedMonthsView } from '@/components/ArchivedMonthsView';
 import { ExpensePlanningManager } from '@/components/ExpensePlanningManager';
+import { CloudSyncManager } from '@/components/CloudSyncManager';
 import { calculateMonthlyData } from '@/utils/cashflow';
 import { StorageService } from '@/utils/storage';
 import { CashFlowSettings as Settings, CustomExpense, FixedAmounts, MonthlyCustomExpense, ExpenseSettings, ArchivedMonth, ExpensePlanningSettings } from '@/types/cashflow';
@@ -490,12 +491,21 @@ const Index = () => {  const [settings, setSettings] = useState<Settings>({
                   vacationExpenses={vacationExpenses}
                   onVacationChange={setVacationExpenses}
                 />
-              </div>
-                <ChantierManager 
+              </div>              <ChantierManager 
                 chantierExpenses={chantierExpenses}
                 onChantierChange={setChantierExpenses}
               />
-                <DataManagement
+              
+              <CloudSyncManager
+                settings={settings}
+                onSettingsUpdate={setSettings}
+                archivedMonths={settings.archivedMonths}
+                onArchivedMonthsUpdate={(months) => setSettings(prev => ({ ...prev, archivedMonths: months }))}
+                expensePlanning={settings.expensePlanningSettings}
+                onExpensePlanningUpdate={(planning) => setSettings(prev => ({ ...prev, expensePlanningSettings: planning }))}
+              />
+              
+              <DataManagement
                 settings={settings}
                 customExpenses={customExpenses}
                 vacationExpenses={vacationExpenses}

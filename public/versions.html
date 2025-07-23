@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CashFlow Mobile - Versions de Test</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            min-height: 100vh;
+            color: white;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            padding: 20px;
+        }
+        .card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        .button { 
+            background: rgba(255,255,255,0.2); 
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 15px 25px; 
+            margin: 10px 0; 
+            border-radius: 10px; 
+            width: 100%; 
+            font-size: 16px;
+            cursor: pointer;
+            touch-action: manipulation;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .button:hover, .button:active { 
+            background: rgba(255,255,255,0.3);
+            transform: scale(0.98);
+        }
+        .button.primary {
+            background: #007AFF;
+            border-color: #007AFF;
+        }
+        .button.emergency {
+            background: #FF3B30;
+            border-color: #FF3B30;
+        }
+        .button.debug {
+            background: #FF9500;
+            border-color: #FF9500;
+        }
+        h1 { 
+            text-align: center; 
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        h2 {
+            color: white;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            padding-bottom: 10px;
+        }
+        .description {
+            margin: 15px 0;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        .status {
+            text-align: center;
+            background: rgba(52, 199, 89, 0.2);
+            border: 1px solid rgba(52, 199, 89, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .emoji {
+            font-size: 2em;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💰 CashFlow Mobile</h1>
+        
+        <div class="status">
+            <strong>🚀 Production Ready - Test sur Mobile</strong><br>
+            Choisissez la version à tester selon vos besoins
+        </div>
+        
+        <div class="card">
+            <h2><span class="emoji">📱</span>Application Principale</h2>
+            <div class="description">
+                Version complète de l'application avec toutes les fonctionnalités :
+                <br>• Interface mobile optimisée
+                <br>• Corrections Chrome iPhone
+                <br>• Touch events améliorés
+                <br>• Safe area support
+            </div>
+            <a href="/" class="button primary">Ouvrir l'Application</a>
+        </div>
+        
+        <div class="card">
+            <h2><span class="emoji">🔍</span>Page de Debug</h2>
+            <div class="description">
+                Outils de diagnostic intégrés pour tester la compatibilité :
+                <br>• Tests automatiques navigateur
+                <br>• Vérification touch events
+                <br>• Informations système
+                <br>• Logs d'erreurs en temps réel
+            </div>
+            <a href="/debug" class="button debug">Ouvrir le Debug</a>
+        </div>
+          <div class="card">
+            <h2><span class="emoji">🚨</span>Page d'Urgence</h2>
+            <div class="description">
+                Version simplifiée qui fonctionne toujours :
+                <br>• HTML simple sans React
+                <br>• Tests de connectivité réseau
+                <br>• Diagnostic navigateur basique
+                <br>• Nettoyage cache/données
+            </div>
+            <a href="/emergency.html" class="button emergency">Ouvrir l'Urgence</a>
+        </div>
+          <div class="card">
+            <h2><span class="emoji">🧪</span>Test React Simple</h2>
+            <div class="description">
+                Version minimale pour isoler les problèmes :
+                <br>• React de base sans providers complexes
+                <br>• Pas de shadcn/ui, react-query, toasters
+                <br>• Interface ultra-simple pour diagnostic
+                <br>• Idéal pour identifier les conflits d'imports
+            </div>
+            <a href="/simple.html" class="button debug">Ouvrir le Test Simple</a>
+        </div>
+        
+        <div class="card">
+            <h2><span class="emoji">🔍</span>Test CSS Responsive</h2>
+            <div class="description">
+                Diagnostic CSS et responsive design :
+                <br>• Test des breakpoints et media queries
+                <br>• Vérification des interactions tactiles
+                <br>• Détection des problèmes de layout
+                <br>• Tests spécifiques iPhone/Chrome
+            </div>
+            <a href="/responsive-test.html" class="button debug">Test Responsive</a>
+        </div>
+        
+        <div class="card">
+            <h2><span class="emoji">📊</span>Informations de Test</h2>
+            <div class="description">
+                <strong>URLs de cette instance :</strong><br>
+                <span id="currentUrl">Chargement...</span>
+                <br><br>
+                <strong>Navigateur détecté :</strong><br>
+                <span id="browserInfo">Chargement...</span>
+                <br><br>
+                <strong>Dernière mise à jour :</strong><br>
+                <span id="lastUpdate"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Afficher les informations actuelles
+        document.getElementById('currentUrl').textContent = window.location.origin;
+        document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+        
+        // Détecter le navigateur
+        const ua = navigator.userAgent;
+        let browser = 'Navigateur inconnu';
+        
+        if (/CriOS/.test(ua)) {
+            browser = '🔵 Chrome iPhone';
+        } else if (/iPhone|iPad|iPod/.test(ua) && /Safari/.test(ua) && !/Chrome/.test(ua)) {
+            browser = '🟦 Safari iPhone';
+        } else if (/Chrome/.test(ua) && !/CriOS/.test(ua)) {
+            browser = '🔵 Chrome Desktop';
+        } else if (/Safari/.test(ua) && !/Chrome/.test(ua)) {
+            browser = '🟦 Safari Desktop';
+        } else if (/Firefox/.test(ua)) {
+            browser = '🟠 Firefox';
+        } else if (/Edge/.test(ua)) {
+            browser = '🔷 Edge';
+        }
+        
+        document.getElementById('browserInfo').textContent = browser;
+        
+        // Ajouter les URLs complètes aux boutons si on est en production
+        if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+            const buttons = document.querySelectorAll('.button');
+            buttons.forEach(button => {
+                const href = button.getAttribute('href');
+                if (href && !href.startsWith('http')) {
+                    button.setAttribute('href', window.location.origin + href);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

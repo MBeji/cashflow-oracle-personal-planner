@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="format-detection" content="telephone=no" />
+    
+    <title>🧪 Test Simple - Cashflow Oracle</title>
+    
+    <style>
+        /* CSS inline ultra-basique pour éviter les problèmes d'imports */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #fff;
+            font-size: 16px; /* Évite le zoom iOS */
+        }
+        
+        #root {
+            min-height: 100vh;
+        }
+        
+        button {
+            font-family: inherit;
+            min-height: 44px; /* Taille tactile iOS recommandée */
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 12px 24px;
+        }
+        
+        /* Corrections iOS de base */
+        button, input, textarea, select {
+            -webkit-appearance: none;
+            border-radius: 0;
+        }
+        
+        /* Empêche le zoom sur focus input */
+        input, textarea, select {
+            font-size: 16px;
+        }
+        
+        /* Correction du scrolling iOS */
+        body {
+            -webkit-overflow-scrolling: touch;
+            overflow-scrolling: touch;
+        }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <div style="padding: 20px; text-align: center;">
+            <h1>🔄 Chargement...</h1>
+            <p>Si cette page ne se charge pas, le problème est au niveau React/JavaScript de base.</p>
+        </div>
+    </div>
+    
+    <script>
+        // Debug de base avant React
+        console.log('🧪 Simple HTML - Starting...');
+        console.log('📱 User Agent:', navigator.userAgent);
+        console.log('🖥️ Viewport:', window.innerWidth, 'x', window.innerHeight);
+        console.log('🌐 Location:', window.location.href);
+        
+        // Test JavaScript de base
+        try {
+            console.log('✅ JavaScript de base fonctionne');
+            console.log('📅 Date:', new Date().toLocaleString());
+        } catch (error) {
+            console.error('❌ Erreur JavaScript de base:', error);
+        }
+    </script>
+    
+    <script type="module">
+        // Import et rendu React de base
+        try {
+            console.log('🔄 Importing React modules...');
+            
+            const { createRoot } = await import('./src/main-simple.tsx');
+            console.log('✅ React modules imported successfully');
+            
+        } catch (error) {
+            console.error('❌ Erreur import React:', error);
+            
+            // Fallback HTML statique
+            document.getElementById('root').innerHTML = `
+                <div style="padding: 20px; background-color: #fee; border: 2px solid #fcc; border-radius: 8px; margin: 20px;">
+                    <h1 style="color: #c00;">❌ Erreur React</h1>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                    <p style="margin-top: 15px;">Cette erreur indique un problème avec React ou ses imports sur iPhone.</p>
+                    <button onclick="window.location.reload()" style="margin-top: 15px; background-color: #007bff; color: white;">
+                        🔄 Recharger
+                    </button>
+                    <button onclick="window.location.href='/emergency.html'" style="margin-top: 15px; margin-left: 10px; background-color: #6c757d; color: white;">
+                        🚨 Page d'urgence
+                    </button>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

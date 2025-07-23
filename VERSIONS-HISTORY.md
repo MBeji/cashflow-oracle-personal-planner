@@ -1,5 +1,63 @@
 # 📋 Historique des Versions - Cash Flow Personnel
 
+## 🌐 **v1.5.0-supabase-integration** *(Version Cloud - 23 Juillet 2025)*
+
+### 🚀 **INTÉGRATION CLOUD SUPABASE - FONCTIONNALITÉ MAJEURE**
+
+**🎯 Nouvelle Capacité Cloud :**
+- **🔐 Authentification Sécurisée** : Système de connexion par email/mot de passe
+- **☁️ Synchronisation Cloud** : Sauvegarde automatique dans Supabase
+- **🔄 Migration Automatique** : Transfer des données localStorage vers cloud
+- **📱 Multi-Appareils** : Accès aux données depuis tous vos appareils
+- **🛡️ Sécurité Avancée** : Chiffrement et Row Level Security (RLS)
+
+**🏗️ Composants Cloud Ajoutés :**
+- `AuthModal` : Interface de connexion/inscription élégante
+- `CloudSyncManager` : Gestionnaire de synchronisation avec statuts visuels
+- `AuthService` : Service d'authentification complet
+- `DataService` : Service de gestion des données cloud
+- Configuration Supabase avec gestion d'erreurs intelligente
+
+**🗄️ Base de Données :**
+- **Tables** : `user_settings`, `archived_months`, `expense_plannings`
+- **Sécurité** : Row Level Security (RLS) activée sur toutes les tables
+- **Schema** : Script SQL complet fourni (`supabase-setup.sql`)
+- **Migration** : Conversion automatique localStorage → Supabase
+
+**🎨 Interface Utilisateur :**
+- **Nouvel Onglet Cloud** dans les Paramètres
+- **États Visuels** : Configuration, Non connecté, Connecté avec badges
+- **Actions Sync** : Sauvegarder, Restaurer, Synchroniser maintenant
+- **Feedback Temps Réel** : Statuts de synchronisation avec animations
+- **Guide Configuration** : Instructions intégrées pour setup Supabase
+
+**⚙️ Fonctionnalités Techniques :**
+- **Auto-Migration** : Première connexion migre toutes les données locales
+- **Fallback localStorage** : Application fonctionne sans Supabase
+- **Gestion Erreurs** : Messages informatifs et retry automatique
+- **Configuration Flexible** : Variables d'environnement `.env.local`
+- **Types TypeScript** : Support complet des types Supabase
+
+**📚 Documentation Complète :**
+- `GUIDE-SUPABASE.md` : Guide complet d'installation et utilisation
+- `.env.example` : Template de configuration
+- Instructions de setup étape par étape
+
+**🔧 Configuration Requise :**
+```env
+VITE_SUPABASE_URL=https://votre-projet.supabase.co
+VITE_SUPABASE_ANON_KEY=votre_clé_publique_ici
+```
+
+**✨ Avantages Utilisateur :**
+- 📱 **Synchronisation Multi-Appareils** : Retrouvez vos données partout
+- 🔒 **Sécurité Renforcée** : Données chiffrées et protégées
+- 💾 **Sauvegarde Automatique** : Plus de risque de perte de données
+- 🚀 **Performance** : Chargement rapide et sync en arrière-plan
+- 🌐 **Accès Web** : Utilisez l'application depuis n'importe quel navigateur
+
+---
+
 ## 🚀 **v1.4.1-before-supabase** *(Version Stable - 23 Juillet 2025)*
 
 ### 📦 **VERSION DE RÉFÉRENCE AVANT SUPABASE**
