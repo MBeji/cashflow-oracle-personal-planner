@@ -1,6 +1,27 @@
 # 📋 Historique des Versions - Cash Flow Personnel
 
-## 🚀 **v1.4.0-expense-planning** *(Version Actuelle - 23 Juillet 2025)*
+## 🚀 **v1.4.1-before-supabase** *(Version Stable - 23 Juillet 2025)*
+
+### 📦 **VERSION DE RÉFÉRENCE AVANT SUPABASE**
+
+**🎯 État de l'Application :**
+- **📅 Planification des Dépenses** : Fonctionnalité complète et opérationnelle
+- **📚 Archivage Mensuel** : Workflow d'archivage en 3 étapes
+- **📊 KPI Année Calendaire** : Calculs sur 12 mois consécutifs
+- **💾 Stockage localStorage** : Toutes données sauvegardées localement
+- **🎮 Interface Complète** : 5 onglets (Prévisions, Statistiques, Planification, Archives, Paramètres)
+
+**📚 Documentation Complète :**
+- `GUIDE-PLANIFICATION.md` : Guide d'utilisation de la planification
+- `GUIDE-ARCHIVAGE.md` : Guide d'archivage mensuel
+- `VERSIONS-HISTORY.md` : Historique complet des versions
+
+**⚠️ Point de Sauvegarde :**
+Cette version sert de **point de référence stable** avant l'intégration de Supabase. En cas de problème avec la base de données, cette version permet un rollback complet vers le stockage localStorage.
+
+---
+
+## 🎨 **v1.4.0-expense-planning** *(Version Précédente - 23 Juillet 2025)*
 
 ### ✨ **FONCTIONNALITÉ MAJEURE : PLANIFICATION DES DÉPENSES**
 
@@ -124,7 +145,7 @@
 
 ## 🎯 **Version Recommandée**
 
-### **✅ v1.4.0-expense-planning** *(Actuelle)*
+### **✅ v1.4.1-before-supabase** *(Stable - localStorage)*
 
 **Pourquoi cette version ?**
 - 🔥 **Fonctionnalité complète** : Archivage mensuel + Planification des dépenses
@@ -172,7 +193,7 @@
 ```bash
 git clone https://github.com/MBeji/cashflow-oracle-personal-planner.git
 cd cashflow-oracle-personal-planner
-git checkout v1.4.0-expense-planning
+git checkout v1.4.1-before-supabase
 npm install
 npm run dev
 ```
