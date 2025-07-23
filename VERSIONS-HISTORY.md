@@ -1,6 +1,38 @@
 # 📋 Historique des Versions - Cash Flow Personnel
 
-## 🚀 **v1.3.1-yearly-kpi** *(Version Actuelle - 22 Juillet 2025)*
+## 🚀 **v1.4.0-expense-planning** *(Version Actuelle - 23 Juillet 2025)*
+
+### ✨ **FONCTIONNALITÉ MAJEURE : PLANIFICATION DES DÉPENSES**
+
+**🎯 Nouvelle Capacité Principale :**
+- **📅 Planification Mensuelle** : Programmation détaillée des dépenses par catégorie
+- **🎯 Remplacement Intelligent** : Le total planifié remplace le montant fixe de 5000 TND
+- **📊 Catégories Prédéfinies** : Alimentation, femme de ménage, études enfants, sport, vêtements, médecins
+- **➕ Catégories Personnalisées** : Ajout libre de nouvelles catégories avec montants
+
+**🏗️ Composants Ajoutés :**
+- `ExpensePlanningModal` : Interface de planification avec sélection mois/année
+- `ExpensePlanningManager` : Gestionnaire complet des planifications
+- Types TypeScript : `MonthlyExpensePlanning`, `PlannedExpenseCategory`
+- Intégration dans `calculateMonthlyData` pour calculs automatiques
+
+**🎨 Interface Utilisateur :**
+- 📅 **Nouvel Onglet "Planification"** dans l'interface principale
+- 🎨 Cards colorées pour chaque catégorie de dépense
+- 📋 Vue d'ensemble des planifications existantes par mois
+- ✏️ Édition et suppression faciles des planifications
+- 💰 Calcul automatique du total planifié
+
+**⚙️ Logique Métier :**
+- **Priorité 1** : Planification spécifique pour le mois
+- **Priorité 2** : Montant par défaut (5000 TND) si pas de planification
+- **Priorité 3** : Ancien système de catégories (compatibilité)
+- 💾 Sauvegarde automatique dans localStorage
+- 🔄 Calculs dynamiques intégrés aux prévisions de cash flow
+
+---
+
+## 📈 **v1.3.1-yearly-kpi** *(Version Précédente - 23 Juillet 2025)*
 
 ### ✨ **AMÉLIORATION MAJEURE : KPI ANNÉE CALENDAIRE**
 
@@ -92,21 +124,23 @@
 
 ## 🎯 **Version Recommandée**
 
-### **✅ v1.3.1-yearly-kpi** *(Actuelle)*
+### **✅ v1.4.0-expense-planning** *(Actuelle)*
 
 **Pourquoi cette version ?**
-- 🔥 **Fonctionnalité complète** : Archivage mensuel opérationnel
+- 🔥 **Fonctionnalité complète** : Archivage mensuel + Planification des dépenses
+- 📅 **Planification avancée** : Programmation détaillée des dépenses par catégorie  
 - 📊 **KPI année calendaire** : Indicateurs basés sur 12 mois cohérents
-- 📅 **Calcul intelligent** : Combinaison données réelles et prévisionnelles
+- � **Gestion intelligente** : Remplacement automatique du montant fixe par planification
 - 📱 **Mobile parfait** : Compatible iPhone/Chrome
-- 💾 **Historique permanent** : Sauvegarde de tous les mois
-- 🎮 **UX optimisée** : Workflow intuitif et guidé
+- 💾 **Historique permanent** : Sauvegarde de tous les mois et planifications
+- 🎮 **UX optimisée** : Interface intuitive avec onglets organisés
 
 **Idéale pour :**
-- Suivi financier personnel rigoureux
+- Planification budgétaire détaillée par catégories
+- Suivi financier personnel rigoureux avec prévisions précises
 - Archivage et historique à long terme
-- Comparaison performance mensuelle
-- Transition automatisée entre mois
+- Comparaison performance mensuelle vs planification
+- Transition automatisée entre mois avec données fiabilisées
 
 ---
 
@@ -138,7 +172,7 @@
 ```bash
 git clone https://github.com/MBeji/cashflow-oracle-personal-planner.git
 cd cashflow-oracle-personal-planner
-git checkout v1.3.1-yearly-kpi
+git checkout v1.4.0-expense-planning
 npm install
 npm run dev
 ```
