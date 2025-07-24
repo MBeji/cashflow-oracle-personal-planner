@@ -21,7 +21,8 @@ import {
   Settings,
   CheckCircle,
   AlertCircle,
-  Loader2
+  Loader2,
+  RotateCcw
 } from 'lucide-react';
 import { AuthModal } from './AuthModal';
 import { AuthService } from '@/services/AuthService';
@@ -78,19 +79,54 @@ export const UserProfile: React.FC<UserProfileProps> = ({
     } finally {
       setIsLoading(false);
     }
+  };  const handleResetToDefaults = () => {
+    if (!user) return;
+    
+    // Créer les paramètres par défaut pour cet utilisateur
+    const userSpecificSettings = createInitialUserSettings(user.email || undefined);
+    
+    // Conserver les archives existantes et certaines données
+    const resetSettings = {
+      ...userSpecificSettings,
+      archivedMonths: settings.archivedMonths || [],
+      currentMonth: settings.currentMonth,
+      currentYear: settings.currentYear,
+      // Garder le solde actuel s'il est défini
+      currentBalance: settings.currentBalance > 0 ? settings.currentBalance : userSpecificSettings.currentBalance
+    };
+    
+    onSettingsUpdate(resetSettings);
+    
+    // Afficher un message de confirmation
+    alert('Paramètres réinitialisés avec vos valeurs par défaut !');
   };
+
   const handleLogin = (loggedInUser: SupabaseUser) => {
     setUser(loggedInUser);
     
     // Vérifier si l'utilisateur a des paramètres personnalisés ou utiliser les valeurs par défaut
     const userSpecificSettings = createInitialUserSettings(loggedInUser.email || undefined);
     
-    // Si c'est la première connexion, on applique la configuration spécifique
-    // Pour Mohamed Beji, cela appliquera ses valeurs actuelles
-    // Pour les nouveaux utilisateurs, cela appliquera les valeurs par défaut (salaire 6000, etc.)
+    // Pour Mohamed Beji ou nouvel utilisateur, on applique toujours la configuration spécifique
+    // Cela garantit que les valeurs correctes sont chargées à chaque connexion
     if (!settings.archivedMonths || settings.archivedMonths.length === 0) {
-      // Première connexion ou pas de données existantes
+      // Première connexion - appliquer la configuration complète
       onSettingsUpdate(userSpecificSettings);
+    } else {
+      // Utilisateur existant - mettre à jour seulement les montants fixes et paramètres de base
+      // pour s'assurer que les valeurs spécifiques sont appliquées
+      const updatedSettings = {
+        ...settings,
+        fixedAmounts: userSpecificSettings.fixedAmounts,
+        currentBalance: settings.currentBalance > 0 ? settings.currentBalance : userSpecificSettings.currentBalance,
+        alertThreshold: userSpecificSettings.alertThreshold,
+        expenseSettings: {
+          ...settings.expenseSettings,
+          defaultCategories: userSpecificSettings.expenseSettings.defaultCategories,
+          defaultSubcategories: userSpecificSettings.expenseSettings.defaultSubcategories
+        }
+      };
+      onSettingsUpdate(updatedSettings);
     }
     
     // Auto-sync après connexion
@@ -243,13 +279,22 @@ export const UserProfile: React.FC<UserProfileProps> = ({
             <Upload className="mr-2 h-4 w-4" />
             Sauvegarder
           </DropdownMenuItem>
-          
-          <DropdownMenuItem 
+            <DropdownMenuItem 
             onClick={() => handleSync()}
             disabled={syncStatus === 'syncing'}
           >
             <Download className="mr-2 h-4 w-4" />
             Restaurer
+          </DropdownMenuItem>
+          
+          <DropdownMenuSeparator />
+          
+          <DropdownMenuItem 
+            onClick={handleResetToDefaults}
+            className="text-orange-600"
+          >
+            <RotateCcw className="mr-2 h-4 w-4" />
+            Réinitialiser mes paramètres
           </DropdownMenuItem>
           
           <DropdownMenuSeparator />
