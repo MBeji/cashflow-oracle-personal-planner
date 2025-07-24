@@ -148,11 +148,25 @@ export const MOHAMED_BEJI_CONFIG: DefaultUserConfig = {
 
 // Fonction pour obtenir la configuration par défaut selon l'utilisateur
 export function getDefaultConfigForUser(userEmail?: string): DefaultUserConfig {
-  // Configuration spécifique pour Mohamed Beji
-  if (userEmail === 'mohamed.beji@example.com' || userEmail === 'mbeji@sofrecom.fr') {
+  // Debug: Afficher l'email détecté
+  console.log('🔍 Email détecté:', userEmail);
+  
+  // Configuration spécifique pour Mohamed Beji - TOUS les emails possibles
+  const mohamedEmails = [
+    'mohamed.beji@example.com',
+    'mbeji@sofrecom.fr',
+    'mohamed.beji@sofrecom.fr',
+    'mbeji@gmail.com',
+    'mohamed@beji.com',
+    // Ajouter d'autres variantes si nécessaire
+  ];
+  
+  if (userEmail && mohamedEmails.includes(userEmail.toLowerCase())) {
+    console.log('✅ Configuration Mohamed Beji appliquée pour:', userEmail);
     return MOHAMED_BEJI_CONFIG;
   }
   
+  console.log('📋 Configuration par défaut appliquée pour:', userEmail);
   // Configuration par défaut pour tous les autres utilisateurs
   return DEFAULT_USER_CONFIG;
 }

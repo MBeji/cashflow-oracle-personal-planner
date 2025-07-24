@@ -19,6 +19,7 @@ import { ArchiveManager } from '@/components/ArchiveManager';
 import { ArchivedMonthsView } from '@/components/ArchivedMonthsView';
 import { ExpensePlanningManager } from '@/components/ExpensePlanningManager';
 import { UserProfile } from '@/components/UserProfile';
+import { ResetMohamedConfig } from '@/components/ResetMohamedConfig';
 import { calculateMonthlyData } from '@/utils/cashflow';
 import { StorageService } from '@/utils/storage';
 import { CashFlowSettings as Settings, CustomExpense, FixedAmounts, MonthlyCustomExpense, ExpenseSettings, ArchivedMonth, ExpensePlanningSettings } from '@/types/cashflow';
@@ -256,9 +257,13 @@ const Index = () => {
             />
           </div>
         </div>
-      </header>
-
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      </header>      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Composant de réinitialisation pour Mohamed */}
+        <ResetMohamedConfig 
+          onSettingsUpdate={setSettings}
+          userEmail={undefined} // Pour l'instant, on l'affiche toujours pour debug
+        />
+        
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-foreground mb-2">
             💰 Cash Flow Personnel

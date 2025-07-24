@@ -100,21 +100,27 @@ export const UserProfile: React.FC<UserProfileProps> = ({
     // Afficher un message de confirmation
     alert('Paramètres réinitialisés avec vos valeurs par défaut !');
   };
-
   const handleLogin = (loggedInUser: SupabaseUser) => {
     setUser(loggedInUser);
     
+    console.log('🔑 Connexion utilisateur:', loggedInUser.email);
+    
     // Vérifier si l'utilisateur a des paramètres personnalisés ou utiliser les valeurs par défaut
     const userSpecificSettings = createInitialUserSettings(loggedInUser.email || undefined);
+    
+    console.log('💰 Salaire dans la config:', userSpecificSettings.fixedAmounts.salary);
+    console.log('🏦 Dette dans la config:', userSpecificSettings.fixedAmounts.debt);
     
     // Pour Mohamed Beji ou nouvel utilisateur, on applique toujours la configuration spécifique
     // Cela garantit que les valeurs correctes sont chargées à chaque connexion
     if (!settings.archivedMonths || settings.archivedMonths.length === 0) {
       // Première connexion - appliquer la configuration complète
+      console.log('🆕 Première connexion - application config complète');
       onSettingsUpdate(userSpecificSettings);
     } else {
       // Utilisateur existant - mettre à jour seulement les montants fixes et paramètres de base
       // pour s'assurer que les valeurs spécifiques sont appliquées
+      console.log('🔄 Utilisateur existant - mise à jour forcée des montants');
       const updatedSettings = {
         ...settings,
         fixedAmounts: userSpecificSettings.fixedAmounts,
